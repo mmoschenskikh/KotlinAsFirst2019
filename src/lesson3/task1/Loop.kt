@@ -75,7 +75,7 @@ fun digitNumber(n: Int): Int {
     do {
         number /= 10
         count++
-    } while (number > 0)
+    } while (number != 0)
     return count
 }
 
@@ -105,7 +105,6 @@ fun fib(n: Int): Int {
  */
 fun lcm(m: Int, n: Int): Int {
     //FIXME
-
     var i = maxOf(m, n)
     if (isCoPrime(m, n)) return m * n
     while (true) {
@@ -240,7 +239,7 @@ fun revert(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = TODO()
+fun isPalindrome(n: Int): Boolean = n == revert(n)
 
 /**
  * Средняя
@@ -250,7 +249,14 @@ fun isPalindrome(n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun hasDifferentDigits(n: Int): Boolean = TODO()
+fun hasDifferentDigits(n: Int): Boolean {
+    var number = n
+    do {
+        if (n % 10 != number % 10) return true
+        number /= 10
+    } while (number != 0)
+    return false
+}
 
 fun someSequenceDigit(n: Int, seq: (Int) -> Int): Int {
     var length = 0
@@ -267,6 +273,7 @@ fun someSequenceDigit(n: Int, seq: (Int) -> Int): Int {
     }
     return currentNumber % 10
 }
+
 /**
  * Сложная
  *
