@@ -97,22 +97,25 @@ fun fib(n: Int): Int {
     return if (n % 2 == 0) fibEven else fibOdd
 }
 
+fun gcd(m: Int, n: Int): Int {
+    var bigNum = maxOf(m, n)
+    var smallNum = minOf(m, n)
+    var tmp: Int
+    while (smallNum != 0) {
+        tmp = bigNum
+        bigNum = smallNum
+        smallNum = tmp % smallNum
+    }
+    return bigNum
+}
+
 /**
  * Простая
  *
  * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
  * минимальное число k, которое делится и на m и на n без остатка
  */
-fun lcm(m: Int, n: Int): Int {
-    //FIXME
-    var i = maxOf(m, n)
-    if (isCoPrime(m, n)) return m * n
-    while (true) {
-        if (i % m == 0 && i % n == 0) break
-        i++
-    }
-    return i
-}
+fun lcm(m: Int, n: Int): Int = m * n / gcd(m, n)
 
 /**
  * Простая
@@ -132,6 +135,7 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
+    if (isPrime(n)) return 1
     for (i in n / 2 downTo 3) {
         if (n % i == 0) return i
     }
@@ -145,13 +149,7 @@ fun maxDivisor(n: Int): Int {
  * Взаимно простые числа не имеют общих делителей, кроме 1.
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
-fun isCoPrime(m: Int, n: Int): Boolean {
-    if (m % 2 == 0 && n % 2 == 0) return false
-    for (i in 3..minOf(m, n) step 2) {
-        if (m % i == 0 && n % i == 0) return false
-    }
-    return true
-}
+fun isCoPrime(m: Int, n: Int): Boolean = gcd(m, n) == 1
 
 /**
  * Простая
