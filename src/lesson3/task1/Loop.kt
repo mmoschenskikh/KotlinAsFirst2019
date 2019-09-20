@@ -3,6 +3,7 @@
 package lesson3.task1
 
 import lesson1.task1.sqr
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 /**
@@ -102,7 +103,16 @@ fun fib(n: Int): Int {
  * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
  * минимальное число k, которое делится и на m и на n без остатка
  */
-fun lcm(m: Int, n: Int): Int = TODO()
+fun lcm(m: Int, n: Int): Int {
+    //FIXME
+    var i = maxOf(m, n)
+    if (isCoPrime(m, n)) return m * n
+    while (true) {
+        if (i % m == 0 && i % n == 0) break
+        i++
+    }
+    return i
+}
 
 /**
  * Простая
@@ -209,7 +219,16 @@ fun cos(x: Double, eps: Double): Double = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun revert(n: Int): Int = TODO()
+fun revert(n: Int): Int {
+    val power = digitNumber(n) - 1
+    var number = n
+    var output = 0
+    for (i in power downTo 0) {
+        output += (number % 10) * 10.0.pow(i).toInt()
+        number /= 10
+    }
+    return output
+}
 
 /**
  * Средняя
