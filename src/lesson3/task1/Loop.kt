@@ -105,6 +105,7 @@ fun fib(n: Int): Int {
  */
 fun lcm(m: Int, n: Int): Int {
     //FIXME
+
     var i = maxOf(m, n)
     if (isCoPrime(m, n)) return m * n
     while (true) {
