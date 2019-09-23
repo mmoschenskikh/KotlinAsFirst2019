@@ -114,7 +114,7 @@ fun gcd(m: Int, n: Int): Int {
  * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
  * минимальное число k, которое делится и на m и на n без остатка
  */
-fun lcm(m: Int, n: Int): Int = m * n / gcd(m, n)
+fun lcm(m: Int, n: Int): Int = m / gcd(m, n) * n
 
 /**
  * Простая
@@ -133,13 +133,7 @@ fun minDivisor(n: Int): Int {
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int {
-    if (isPrime(n)) return 1
-    for (i in n / 2 downTo 3) {
-        if (n % i == 0) return i
-    }
-    return 1
-}
+fun maxDivisor(n: Int): Int = n / minDivisor(n)
 
 /**
  * Простая
@@ -197,15 +191,15 @@ fun collatzSteps(x: Int): Int {
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
 fun sin(x: Double, eps: Double): Double {
-    var element: Double
-    var value = 0.0
-    var n = 0 // Номер члена ряда
     val angle = x % (2 * PI)
-    do {
-        element = (-1.0).pow(n) * angle.pow(2 * n + 1) / factorial(2 * n + 1)
+    var element = angle
+    var value = angle
+    var n = 1
+    while (abs(element) >= eps) {
+        element *= -angle.pow(2) / ((n + 1) * (n + 2))
         value += element
-        n++
-    } while (abs(element) >= eps)
+        n += 2
+    }
     return value
 }
 
@@ -219,15 +213,15 @@ fun sin(x: Double, eps: Double): Double {
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
 fun cos(x: Double, eps: Double): Double {
-    var element: Double
-    var value = 0.0
-    var n = 0 // Номер члена ряда
     val angle = x % (2 * PI)
-    do {
-        element = (-1.0).pow(n) * angle.pow(2 * n) / factorial(2 * n)
+    var element = 1.0
+    var value = 1.0
+    var n = 0
+    while (abs(element) >= eps) {
+        element *= -angle.pow(2) / ((n + 1) * (n + 2))
         value += element
-        n++
-    } while (abs(element) >= eps)
+        n += 2
+    }
     return value
 }
 
@@ -269,9 +263,10 @@ fun isPalindrome(n: Int): Boolean = n == revert(n)
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun hasDifferentDigits(n: Int): Boolean {
+    val digit = n % 10
     var number = n
     do {
-        if (n % 10 != number % 10) return true
+        if (digit != number % 10) return true
         number /= 10
     } while (number != 0)
     return false
