@@ -233,10 +233,9 @@ fun cos(x: Double, eps: Double): Double {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun revert(n: Int): Int {
-    val numberSize = digitNumber(n)
     var number = n
     var output = 0
-    for (i in 1..numberSize) {
+    while (number > 0) {
         output *= 10
         output += number % 10
         number /= 10
