@@ -237,10 +237,10 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
 fun convert(n: Int, base: Int): List<Int> {
     var number = n
     val result = mutableListOf<Int>()
-    while (number > 0) {
+    do {
         result.add(0, number % base)
         number /= base
-    }
+    } while (number > 0)
     return result
 }
 
