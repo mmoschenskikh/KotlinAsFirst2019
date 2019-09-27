@@ -117,8 +117,7 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-//fun abs(v: List<Double>): Double = sqrt(v.map { it * it }.sum())
-fun abs(v: List<Double>): Double = sqrt(v.fold(0.0) { previous, current -> previous + current * current })
+fun abs(v: List<Double>): Double = sqrt(v.map { it * it }.sum())
 
 /**
  * Простая
@@ -138,7 +137,7 @@ fun mean(list: List<Double>): Double = if (list.isEmpty()) 0.0 else list.sum() /
 fun center(list: MutableList<Double>): MutableList<Double> {
     val avg = mean(list)
     if (avg != 0.0) {
-        for (i in 0 until list.size) {
+        for (i in list.indices) {
             list[i] -= avg
         }
     }
@@ -154,7 +153,7 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  */
 fun times(a: List<Int>, b: List<Int>): Int {
     var sum = 0
-    for (i in 0 until a.size) {
+    for (i in a.indices) {
         sum += a[i] * b[i]
     }
     return sum
@@ -189,12 +188,10 @@ fun polynom(p: List<Int>, x: Int): Int {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun accumulate(list: MutableList<Int>): MutableList<Int> {
-    var item: Int
-    var sum = 0
-    for (i in 0 until list.size) {
-        item = list[i]
+    var sum: Int
+    for (i in 1 until list.size) {
+        sum = list[i - 1]
         list[i] += sum
-        sum += item
     }
     return list
 }
@@ -208,12 +205,14 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
  */
 fun factorize(n: Int): List<Int> {
     var number = n
-    var factor: Int
+    var factor = 2
     val factors = mutableListOf<Int>()
     while (number > 1) {
-        factor = minDivisor(number)
-        number /= factor
-        factors.add(factor)
+        while (number % factor == 0) {
+            number /= factor
+            factors.add(factor)
+        }
+        factor++
     }
     return factors
 }
@@ -259,7 +258,7 @@ fun convertToString(n: Int, base: Int): String {
     val convertedNumber = convert(n, base)
     var output = ""
     for (element in convertedNumber) {
-        output += if (element > 9) (87 + element).toChar() else element
+        output += if (element > 9) 'W' + element else element
     }
     return output
 }
@@ -272,10 +271,11 @@ fun convertToString(n: Int, base: Int): String {
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
 fun decimal(digits: List<Int>, base: Int): Int {
-    val power = digits.size - 1
     var result = 0
-    for (i in 0..power) {
-        result += digits[i] * base.toDouble().pow(power - i).toInt()
+    var multiplier = base.toDouble().pow(digits.size).toInt()
+    for (i in digits.indices) {
+        multiplier /= base
+        result += digits[i] * multiplier
     }
     return result
 }
@@ -294,10 +294,9 @@ fun decimal(digits: List<Int>, base: Int): Int {
  */
 fun decimalFromString(str: String, base: Int): Int {
     var digit: Int
-    val digits = str.toList()
     val number = mutableListOf<Int>()
-    for (item in digits) {
-        digit = if (item !in '0'..'9') item.toInt() - 87 else item.toString().toInt()
+    for (item in str) {
+        digit = if (item in '0'..'9') item.toString().toInt() else item - 'W'
         number.add(digit)
     }
     return decimal(number, base)
