@@ -272,10 +272,10 @@ fun convertToString(n: Int, base: Int): String {
  */
 fun decimal(digits: List<Int>, base: Int): Int {
     var result = 0
-    var multiplier = base.toDouble().pow(digits.size).toInt()
+    var multiplier = base.toDouble().pow(digits.size - 1).toInt()
     for (i in digits.indices) {
-        multiplier /= base
         result += digits[i] * multiplier
+        multiplier /= base
     }
     return result
 }

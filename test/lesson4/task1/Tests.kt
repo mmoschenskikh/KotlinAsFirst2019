@@ -190,6 +190,7 @@ class Tests {
         assertEquals(100, decimal(listOf(1, 2, 1, 0), 4))
         assertEquals(250, decimal(listOf(1, 3, 12), 14))
         assertEquals(1000, decimal(listOf(2, 14, 12), 19))
+        assertEquals(Int.MAX_VALUE, decimal(listOf(10, 0, 2, 2, 2, 0, 2, 8, 1), 11))
     }
 
     @Test
