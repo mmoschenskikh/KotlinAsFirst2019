@@ -259,9 +259,7 @@ fun convertToString(n: Int, base: Int): String {
     val convertedNumber = convert(n, base)
     var output = ""
     for (element in convertedNumber) {
-        if (element > 9) {
-            output += (87 + element).toChar()
-        } else output += element
+        output += if (element > 9) (87 + element).toChar() else element
     }
     return output
 }
@@ -299,9 +297,7 @@ fun decimalFromString(str: String, base: Int): Int {
     val digits = str.toList()
     val number = mutableListOf<Int>()
     for (item in digits) {
-        if (item !in '0'..'9') {
-            digit = item.toInt() - 87
-        } else digit = item.toString().toInt()
+        digit = if (item !in '0'..'9') item.toInt() - 87 else item.toString().toInt()
         number.add(digit)
     }
     return decimal(number, base)
