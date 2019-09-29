@@ -3,7 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
-import lesson3.task1.minDivisor
+import lesson3.task1.digitNumber
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -310,7 +310,21 @@ fun decimalFromString(str: String, base: Int): Int {
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun roman(n: Int): String = TODO()
+fun roman(n: Int): String {
+    val values = listOf(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+    val romanNumbers = listOf("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I")
+    var number = n
+    var i = 0
+    var output = ""
+    while (number > 0) {
+        while (number - values[i] < 0) {
+            i++
+        }
+        number -= values[i]
+        output += romanNumbers[i]
+    }
+    return output
+}
 
 /**
  * Очень сложная
@@ -319,4 +333,42 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+fun russianWordsForThreeDigits(n: Int, mode: Int = 0): String {
+//mode = 0 для разрядов сотен и младше, mode = 1 для разрядов тысяч и старше
+    val wordsUnderTwenty = listOf(
+        "",
+        "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять",
+        "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать",
+        "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"
+    )
+    val wordsForDozens = listOf(
+        "", "", "двадцать", "тридцать", "сорок", "пятьдесят",
+        "шестьдесят", "семьдесят", "восемьдесят", "девяносто"
+    )
+    val wordsForHundreds = listOf(
+        "", "сто", "двести", "триста", "четыреста", "пятьсот",
+        "шестьсот", "семьсот", "восемьсот", "девятьсот"
+    )
+    val hundreds = wordsForHundreds[n / 100]
+    val dozens = wordsForDozens[(n % 100) / 10]
+    val underTwenty =
+        if ((n % 10 !in 1..2 || n % 100 in 11..12) && mode == 1 || mode == 0)
+            if (dozens == "") wordsUnderTwenty[n % 20] else wordsUnderTwenty[n % 10]
+        else
+            if (n % 10 == 1) "одна" else "две"
+    val thousandWord =
+        when {
+            mode == 0 -> ""
+            n % 100 != 11 && n % 10 == 1 -> "тысяча"
+            n % 100 !in 12..14 && n % 10 in 2..4 -> "тысячи"
+            else -> "тысяч"
+        }
+    val output = listOf(hundreds, dozens, underTwenty, thousandWord)
+    return output.filter { it != "" }.joinToString(separator = " ", postfix = "")
+}
+
+fun russian(n: Int): String = when {
+    digitNumber(n) < 4 -> russianWordsForThreeDigits(n)
+    n % 1000 == 0 -> russianWordsForThreeDigits(n / 1000, 1)
+    else -> russianWordsForThreeDigits(n / 1000, 1) + " " + russianWordsForThreeDigits(n % 1000)
+}
