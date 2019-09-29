@@ -317,9 +317,7 @@ fun roman(n: Int): String {
     var i = 0
     var output = ""
     while (number > 0) {
-        while (number - values[i] < 0) {
-            i++
-        }
+        while (number < values[i]) i++
         number -= values[i]
         output += romanNumbers[i]
     }
