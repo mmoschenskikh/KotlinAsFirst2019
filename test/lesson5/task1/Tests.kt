@@ -123,6 +123,12 @@ class Tests {
     fun containsIn() {
         assertTrue(containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")))
         assertFalse(containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")))
+        assertTrue(
+            containsIn(
+                mapOf("a" to "z", "abcd" to "abvgd"),
+                mapOf("a" to "z", "b" to "c", "lol" to "kek", "chebu" to "rek", "abcd" to "abvgd")
+            )
+        )
     }
 
     @Test
@@ -131,13 +137,17 @@ class Tests {
         val from = mutableMapOf("a" to "z", "b" to "c")
 
         subtractOf(from, mapOf())
-        assertEquals(from, mapOf("a" to "z", "b" to "c"))
+        assertEquals(mapOf("a" to "z", "b" to "c"), from)
 
         subtractOf(from, mapOf("b" to "z"))
-        assertEquals(from, mapOf("a" to "z", "b" to "c"))
+        assertEquals(mapOf("a" to "z", "b" to "c"), from)
 
         subtractOf(from, mapOf("a" to "z"))
-        assertEquals(from, mapOf("b" to "c"))
+        assertEquals(mapOf("b" to "c"), from)
+
+        val from2 = mutableMapOf("a" to "z", "b" to "c", "lol" to "kek", "chebu" to "rek", "abcd" to "abvgd")
+        subtractOf(from2, mapOf("a" to "z", "chebu" to "rek"))
+        assertEquals(mapOf("b" to "c", "lol" to "kek", "abcd" to "abvgd"), from2)
     }
 
     @Test
@@ -198,6 +208,10 @@ class Tests {
             averageStockPrice(listOf())
         )
         assertEquals(
+            mapOf("MSFT" to 150.0, "NFLX" to 45.0),
+            averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0, "NFLX" to 50.0))
+        )
+        assertEquals(
             mapOf("MSFT" to 100.0, "NFLX" to 40.0),
             averageStockPrice(listOf("MSFT" to 100.0, "NFLX" to 40.0))
         )
@@ -206,8 +220,17 @@ class Tests {
             averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0))
         )
         assertEquals(
-            mapOf("MSFT" to 150.0, "NFLX" to 45.0),
-            averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0, "NFLX" to 50.0))
+            mapOf("MSFT" to 150.0, "NFLX" to 40.0, "IBM" to 100.0, "AAPL" to 77.5),
+            averageStockPrice(
+                listOf(
+                    "MSFT" to 100.0, "IBM" to 100.0, "MSFT" to 200.0, "AAPL" to 59.0, "NFLX" to 40.0,
+                    "AAPL" to 96.0
+                )
+            )
+        )
+        assertEquals(
+            mapOf("MSFT" to 150.0, "NFLX" to 40.0),
+            averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0))
         )
     }
 
@@ -225,6 +248,17 @@ class Tests {
             findCheapestStuff(
                 mapOf("Мария" to ("печенье" to 20.0), "Орео" to ("печенье" to 100.0)),
                 "печенье"
+            )
+        )
+        assertEquals(
+            "Тархун",
+            findCheapestStuff(
+                mapOf(
+                    "Coca-Cola" to ("напиток" to 79.90), "Fanta" to ("напиток" to 69.90),
+                    "Шишкин лес" to ("напиток" to 35.7), "Тархун" to ("напиток" to 25.0),
+                    "Дюшес" to ("напиток" to 789456.0), "Доширак" to ("лапша" to 24.99)
+                ),
+                "напиток"
             )
         )
     }
@@ -252,6 +286,10 @@ class Tests {
             emptyMap<String, Int>(),
             extractRepeats(listOf("a", "b", "c"))
         )
+        assertEquals(
+            mapOf("a" to 3, "лол" to 5),
+            extractRepeats(listOf("лол", "a", "a", "лол", "лол", "b", "лол", "c", "a", "лол", "kek", "chebooreck"))
+        )
     }
 
     @Test
@@ -260,6 +298,7 @@ class Tests {
         assertFalse(hasAnagrams(emptyList()))
         assertTrue(hasAnagrams(listOf("рот", "свет", "тор")))
         assertFalse(hasAnagrams(listOf("рот", "свет", "код", "дверь")))
+        assertTrue(hasAnagrams(listOf("анаграмма", "грамм", "магма", "нагар")))
     }
 
     @Test
@@ -326,6 +365,12 @@ class Tests {
             bagPacking(
                 mapOf("Кубок" to (500 to 2000), "Слиток" to (1000 to 5000)),
                 450
+            )
+        )
+        assertEquals(
+            setOf("Гитара", "Ноутбук"),
+            bagPacking(
+                mapOf("Магнитофон" to (4 to 3000), "Ноутбук" to (3 to 2000), "Гитара" to (1 to 1500)), 4
             )
         )
     }
