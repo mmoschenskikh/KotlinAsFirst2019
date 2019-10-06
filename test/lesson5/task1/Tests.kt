@@ -165,6 +165,13 @@ class Tests {
             emptyList<String>(),
             whoAreInBoth(listOf("Marat", "Mikhail"), listOf("Sveta", "Kirill"))
         )
+        assertEquals(
+            listOf("Alex", "Bob", "Marat"),
+            whoAreInBoth(
+                listOf("John", "Alex", "Bob", "Ann", "Marat", "Mikhail"),
+                listOf("Oleg", "Marat", "Alex", "Bob", "Kirill")
+            )
+        )
     }
 
     @Test
@@ -196,6 +203,22 @@ class Tests {
             mergePhoneBooks(
                 mapOf("Emergency" to "112", "Fire department" to "01"),
                 mapOf("Emergency" to "911", "Police" to "02")
+            )
+        )
+        assertEquals(
+            mapOf(
+                "Emergency" to "112, 911", "Fire department" to "01", "Police" to "02",
+                "Alex" to "656-023", "Ann" to "123-45-67", "Bob" to "483-55-95",
+                "John" to "656-023, 228-13-37"
+            ),
+            mergePhoneBooks(
+                mapOf(
+                    "Emergency" to "112", "Fire department" to "01", "John" to "656-023", "Bob" to "483-55-95"
+                ),
+                mapOf(
+                    "Alex" to "656-023", "John" to "228-13-37", "Ann" to "123-45-67",
+                    "Emergency" to "911", "Police" to "02"
+                )
             )
         )
     }
@@ -295,10 +318,11 @@ class Tests {
     @Test
     @Tag("Normal")
     fun hasAnagrams() {
-        assertFalse(hasAnagrams(emptyList()))
+        assertTrue(hasAnagrams(listOf("анаграмма", "грамм", "магма", "нагар")))
         assertTrue(hasAnagrams(listOf("рот", "свет", "тор")))
         assertFalse(hasAnagrams(listOf("рот", "свет", "код", "дверь")))
-        assertTrue(hasAnagrams(listOf("анаграмма", "грамм", "магма", "нагар")))
+        assertFalse(hasAnagrams(emptyList()))
+        assertFalse(hasAnagrams(listOf("мафия", "рот", "город", "свет", "бухгалтер", "код", "дверь", "замок")))
     }
 
     @Test

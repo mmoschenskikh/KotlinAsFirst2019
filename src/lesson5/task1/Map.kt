@@ -106,7 +106,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> =
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")) -> true
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
-fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = a.all { it in b.entries }
+fun containsIn(a: Map<String, String>, b: Map<String, String>) = a.all { it in b.entries }
 
 /**
  * Простая
@@ -150,7 +150,13 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = a.intersect(b
  *     mapOf("Emergency" to "911", "Police" to "02")
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
-fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> = TODO()
+fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> =
+    mapB + mapA.mapValues {
+        if (it.value != mapB[it.key] && mapB[it.key] != null)
+            (listOf(it.value, mapB[it.key]).joinToString())
+        else
+            it.value
+    }
 
 /**
  * Средняя
@@ -219,8 +225,15 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    val lol = words.map { word -> word.toList().groupingBy { it }.eachCount() }
-    TODO()
+    val charLists = words.map { word ->
+        word.toList().groupingBy { it }.eachCount()
+    }.sortedByDescending { it.size }
+    for (i in charLists.indices) {
+        for (j in (i + 1) until charLists.size) {
+            if (charLists[j].all { it.value <= charLists[i][it.key] ?: 0 }) return true
+        }
+    }
+    return false
 }
 
 /**
