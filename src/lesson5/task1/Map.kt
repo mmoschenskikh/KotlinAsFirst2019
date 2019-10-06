@@ -224,17 +224,8 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-fun hasAnagrams(words: List<String>): Boolean {
-    val charLists = words.map { word ->
-        word.toList().groupingBy { it }.eachCount()
-    }.sortedByDescending { it.size }
-    for (i in charLists.indices) {
-        for (j in (i + 1) until charLists.size) {
-            if (charLists[j].all { it.value <= charLists[i][it.key] ?: 0 }) return true
-        }
-    }
-    return false
-}
+fun hasAnagrams(words: List<String>): Boolean =
+    words.map { word -> word.toList().groupingBy { it }.eachCount() }.toSet().size < words.size
 
 /**
  * Сложная

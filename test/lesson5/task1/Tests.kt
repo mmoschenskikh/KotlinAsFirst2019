@@ -318,7 +318,8 @@ class Tests {
     @Test
     @Tag("Normal")
     fun hasAnagrams() {
-        assertTrue(hasAnagrams(listOf("анаграмма", "грамм", "магма", "нагар")))
+        assertTrue(hasAnagrams(listOf("магам", "гамам", "магма", "амагм")))
+        assertFalse(hasAnagrams(listOf("ггам", "маг")))
         assertTrue(hasAnagrams(listOf("рот", "свет", "тор")))
         assertFalse(hasAnagrams(listOf("рот", "свет", "код", "дверь")))
         assertFalse(hasAnagrams(emptyList()))
