@@ -106,6 +106,10 @@ class Tests {
     @Tag("Normal")
     fun center() {
         assertEquals(listOf<Double>(), center(mutableListOf()))
+        assertEquals(
+            listOf(-19.72, 54.28, -21.72, 21.880000000000003, -34.72),
+            center(mutableListOf(15.0, 89.0, 13.0, 56.6, 0.0))
+        )
     }
 
     @Test
