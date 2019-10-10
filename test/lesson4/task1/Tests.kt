@@ -110,6 +110,8 @@ class Tests {
             listOf(-19.72, 54.28, -21.72, 21.880000000000003, -34.72),
             center(mutableListOf(15.0, 89.0, 13.0, 56.6, 0.0))
         )
+        val toMutate = mutableListOf(-3.0, -1.0, 4.0, 5.0, -5.0)
+        assertTrue(toMutate === center(toMutate)) { "You should mutate an input list, not create a copy" }
     }
 
     @Test
