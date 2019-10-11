@@ -357,6 +357,71 @@ class Tests {
                 )
             )
         )
+        assertEquals(
+            mapOf(
+                "Marat" to setOf("Mikhail", "Sveta"),
+                "Sveta" to setOf("Marat", "Mikhail"),
+                "Mikhail" to setOf("Sveta", "Marat"),
+                "Oleg" to setOf(),
+                "Igor" to setOf("Masha", "Oleg", "Mikhail", "Sveta", "Marat"),
+                "Masha" to setOf("Oleg")
+            ),
+            propagateHandshakes(
+                mapOf(
+                    "Marat" to setOf("Mikhail", "Sveta"),
+                    "Sveta" to setOf("Marat"),
+                    "Mikhail" to setOf("Sveta"),
+                    "Oleg" to setOf(),
+                    "Masha" to setOf("Oleg"),
+                    "Igor" to setOf("Masha", "Mikhail")
+                )
+            )
+        )
+        assertEquals(
+            mapOf(
+                "Marat" to setOf("Mikhail", "Sveta", "Vika"),
+                "Sveta" to setOf("Marat", "Mikhail", "Vika"),
+                "Mikhail" to setOf("Sveta", "Marat", "Vika"),
+                "Oleg" to setOf(),
+                "Vika" to setOf(),
+                "Igor" to setOf("Masha", "Oleg", "Mikhail", "Sveta", "Marat", "Vika"),
+                "Masha" to setOf("Oleg")
+            ),
+            propagateHandshakes(
+                mapOf(
+                    "Marat" to setOf("Mikhail", "Sveta"),
+                    "Sveta" to setOf("Marat", "Vika"),
+                    "Mikhail" to setOf("Sveta"),
+                    "Oleg" to setOf(),
+                    "Masha" to setOf("Oleg"),
+                    "Igor" to setOf("Masha", "Mikhail")
+                )
+            )
+        )
+        assertEquals(
+            mapOf<String, Set<String>>(
+                "Marat" to setOf(),
+                "Sveta" to setOf()
+            ),
+            propagateHandshakes(
+                mapOf(
+                    "Marat" to setOf(),
+                    "Sveta" to setOf()
+                )
+            )
+        )
+        assertEquals(
+            mapOf(
+                "Marat" to setOf("Sveta"),
+                "Sveta" to setOf("Marat")
+            ),
+            propagateHandshakes(
+                mapOf(
+                    "Marat" to setOf("Sveta"),
+                    "Sveta" to setOf("Marat")
+                )
+            )
+        )
     }
 
     @Test
