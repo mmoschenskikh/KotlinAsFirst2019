@@ -320,30 +320,33 @@ fun main() {
     bagPacking(
         mapOf("Магнитофон" to (4 to 3000), "Ноутбук" to (3 to 2000), "Гитара" to (1 to 1500)), 4
     )
-    bagPacking(
-        mapOf("Кубок" to (500 to 2000), "Слиток" to (1000 to 5000)),
-        450
-    )
-    bagPacking(
-        mapOf("Кубок" to (500 to 2000), "Слиток" to (1000 to 5000)),
-        850
-    )
 }
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    val items = listOf("") + treasures.keys.toList()
     val capacities =
         treasures.values.asSequence().filter { it.first < capacity }.map { it.first }.toList().sorted() + capacity
-    var weight: Int
-    println(capacities)
-    val table = mutableMapOf<String, List<MutableMap<MutableList<String>, Int>>>()
-    for (thing in treasures.keys) {
-        table[thing] = List(capacities.size) { mutableMapOf<MutableList<String>, Int>() }
-        weight = treasures[thing]!!.first
-        for (i in table[thing]!!.indices) {
-            if (weight <= capacities[i]) {
-                TODO()
+    var currentWeight: Int
+    var currentItem: String
+    var currentCost: Int
+    val table = List(items.size) { List(capacities.size) { mutableListOf<String>() to mutableListOf<Int>() } }
+    for (i in 1 until table.size) {
+        currentItem = items[i]
+        currentCost = treasures[currentItem]?.second ?: 0
+        currentWeight = treasures[currentItem]?.first ?: 0
+        for (j in table[i].indices) {
+            println("$currentWeight <= ${capacities[j]} && $currentCost > ${table[i - 1][j].second.sum()}")
+            if (currentWeight <= capacities[j] && currentCost > table[i - 1][j].second.sum()) {
+                table[i][j].first.add(currentItem)
+                table[i][j].second.add(currentCost)
+            } else {
+                table[i][j].first.clear()
+                table[i][j].second.clear()
+                table[i][j].first.addAll(table[i - 1][j].first)
+                table[i][j].second.addAll(table[i - 1][j].second)
             }
+            TODO()
         }
     }
-    println(table)
+    table.forEach { println(it) }
     return setOf()
 }
