@@ -256,12 +256,13 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     val allPeople = friends.keys + friends.values.flatten()
     val handshakes = friends.mapValues { it.value.toMutableSet() }.toMutableMap()
     val toAdd = mutableSetOf<String>()
-    var unchangedFriendList: MutableSet<String>
+    var unchangedFriendList = mutableSetOf<String>()
     allPeople.forEach { if (handshakes[it] == null) handshakes[it] = mutableSetOf() }
     for ((friend, friendList) in handshakes) {
-        unchangedFriendList = friendList
+        unchangedFriendList.clear()
         do {
             toAdd.clear()
+            unchangedFriendList.addAll(friendList)
             friendList.forEach { toAdd.addAll(handshakes[it]!!) }
             friendList.addAll(toAdd)
         } while (friendList.size != unchangedFriendList.size)
@@ -317,6 +318,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    //FIXME
     val items = listOf("") + treasures.keys.toList()
     val capacities =
         listOf(0) + treasures.values.asSequence().filter { it.first < capacity }.map { it.first }.toSet().toList().sorted() + capacity
@@ -348,7 +350,6 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 table[i][j].first.putAll(table[i][k].first + Pair(currentItem, currentWeight))
                 table[i][j].second.addAll(table[i][k].second + currentValue)
             }
-
         }
     }
     return table.last().last().first.keys
