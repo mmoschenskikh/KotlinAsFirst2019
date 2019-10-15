@@ -484,6 +484,17 @@ class Tests {
                 mapOf("Магнитофон" to (4 to 3000), "Ноутбук" to (3 to 2000), "Гитара" to (1 to 1500)), 4
             )
         )
+        assertEquals(
+            setOf("iPhone", "Ноутбук"),
+            bagPacking(
+                mapOf(
+                    "iPhone" to (1 to 2000),
+                    "Магнитофон" to (4 to 3000),
+                    "Ноутбук" to (3 to 2000),
+                    "Гитара" to (1 to 1500)
+                ), 4
+            )
+        )
     }
 
     // TODO: map task tests
