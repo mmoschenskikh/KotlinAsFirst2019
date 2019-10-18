@@ -256,7 +256,7 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     val allPeople = friends.keys + friends.values.flatten()
     val handshakes = friends.mapValues { it.value.toMutableSet() }.toMutableMap()
     val toAdd = mutableSetOf<String>()
-    var unchangedFriendList = mutableSetOf<String>()
+    val unchangedFriendList = mutableSetOf<String>()
     allPeople.forEach { if (handshakes[it] == null) handshakes[it] = mutableSetOf() }
     for ((friend, friendList) in handshakes) {
         unchangedFriendList.clear()
@@ -332,16 +332,13 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         currentValue = treasures[currentItem]?.second ?: 0
         currentWeight = treasures[currentItem]?.first ?: 0
         for (j in 1 until table[i].size) {
-            if (currentWeight <= capacities[j] && currentValue >= table[i - 1][j].second.sum()) {
+            if (currentWeight <= capacities[j] && currentValue > table[i - 1][j].second.sum()) {
                 table[i][j].first[currentItem] = currentWeight
                 table[i][j].second.add(currentValue)
-                if (table[i][j].second.sum() == table[i - 1][j].second.sum()) {
-                    table[i][j].first.clear()
-                    table[i][j].first.putAll(listOf(table[i][j].first, table[i - 1][j].first).minBy { it.values.sum() }!!)
-                }
             } else {
-                table[i][j].first.putAll(table[i - 1][j].first)
-                table[i][j].second.addAll(table[i - 1][j].second)
+                var prev = listOf(table[i][j - 1], table[i - 1][j]).maxBy { it.second.sum() }
+                table[i][j].first.putAll(prev!!.first)
+                table[i][j].second.addAll(prev.second)
             }
             k = capacities.indexOfLast { it <= capacities[j] - currentWeight }
             if (k > 0 && currentItem !in table[i][k].first.keys && table[i - 1][j].second.sum() < table[i][k].second.sum() + currentValue) {

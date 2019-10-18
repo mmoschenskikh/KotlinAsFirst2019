@@ -511,7 +511,35 @@ class Tests {
                 ), 4
             )
         )
+        assertEquals(
+            setOf("0"),
+            bagPacking(
+                mapOf("0" to (1 to 1), "1" to (1 to 1)), 1
+            )
+        )
+        assertEquals(
+            setOf("6"),
+            bagPacking(
+                mapOf(
+                    "0" to (1 to 1), "1" to (1 to 1), "2" to (1 to 1), "3" to (1 to 1), "4" to (1 to 1),
+                    "5" to (1 to 1), "6" to (1 to 2), "7" to (1 to 1), "8" to (1 to 1), "9" to (1 to 1),
+                    "10" to (1 to 1), "11" to (1 to 1), "12" to (1 to 1), "13" to (1 to 1), "14" to (1 to 1),
+                    "15" to (1 to 1), "16" to (1 to 1), "17" to (1 to 1), "18" to (1 to 2), "19" to (1 to 1),
+                    "20" to (1 to 1), "21" to (1 to 1), "22" to (1 to 1)
+                ), 1
+            )
+        )
+        assertEquals(
+            setOf("Тамбов", "Иркутск", "Магадан"),
+            bagPacking(
+                mapOf(
+                    "Тамбов" to (1 to 7),
+                    "Воронеж" to (1 to 6),
+                    "Иркутск" to (2 to 9),
+                    "Воркута" to (4 to 9),
+                    "Магадан" to (1 to 8)
+                ), 4
+            )
+        )
     }
-
-    // TODO: map task tests
 }
