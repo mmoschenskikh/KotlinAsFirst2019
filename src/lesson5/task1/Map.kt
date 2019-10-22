@@ -319,24 +319,23 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     val items = listOf("") + treasures.keys.toList().sortedBy { treasures[it]!!.first }
-    val capacities =
-        listOf(0) + treasures.values.toSet().asSequence().filter { it.first < capacity }.map { it.first }.toList().sorted() + capacity
+    val capacities = (listOf(0) + List(treasures.size) { index -> (index + 1) * capacity / treasures.size }).toSet().toList()
+    val table = List(items.size) { List(capacities.size) { mutableMapOf<String, Int>() to mutableListOf<Int>() } }
     var currentItem: String
     var currentValue: Int
     var currentWeight: Int
-    var k: Int
-    val table = List(items.size) { List(capacities.size) { mutableMapOf<String, Int>() to mutableListOf<Int>() } }
+    var suitableItem: Int
     for (i in 1 until table.size) {
         currentItem = items[i]
         currentValue = treasures[currentItem]?.second ?: 0
         currentWeight = treasures[currentItem]?.first ?: 0
         for (j in 1 until table[i].size) {
             if (currentWeight <= capacities[j]) {
-                k = capacities.indexOfLast { it <= capacities[j] - currentWeight }
-                k += if (k == -1) 1 else 0
-                if (currentValue + table[i - 1][k].second.sum() > table[i - 1][j].second.sum()) {
-                    table[i][j].first.putAll(table[i - 1][k].first + Pair(currentItem, currentWeight))
-                    table[i][j].second.addAll(table[i - 1][k].second + listOf(currentValue))
+                suitableItem = capacities.indexOfLast { it <= capacities[j] - currentWeight }
+                suitableItem += if (suitableItem == -1) 1 else 0
+                if (currentValue + table[i - 1][suitableItem].second.sum() > table[i - 1][j].second.sum()) {
+                    table[i][j].first.putAll(table[i - 1][suitableItem].first + Pair(currentItem, currentWeight))
+                    table[i][j].second.addAll(table[i - 1][suitableItem].second + listOf(currentValue))
                 } else {
                     table[i][j].first.putAll(table[i - 1][j].first)
                     table[i][j].second.addAll(table[i - 1][j].second)
