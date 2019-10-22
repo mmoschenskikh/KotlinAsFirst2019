@@ -319,7 +319,9 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     val items = listOf("") + treasures.keys.toList().sortedBy { treasures[it]!!.first }
-    val capacities = (listOf(0) + List(treasures.size) { index -> (index + 1) * capacity / treasures.size }).toSet().toList()
+    val capacities =
+        (listOf(0) + treasures.values.filter { it.first < capacity }.map { it.first } +
+                List(treasures.size) { index -> (index + 1) * capacity / treasures.size }).toSet().toList().sorted()
     val table = List(items.size) { List(capacities.size) { mutableMapOf<String, Int>() to mutableListOf<Int>() } }
     var currentItem: String
     var currentValue: Int
