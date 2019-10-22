@@ -318,13 +318,12 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    //FIXME
     val items = listOf("") + treasures.keys.toList()
     val capacities =
-        listOf(0) + treasures.values.asSequence().filter { it.first < capacity }.map { it.first }.toSet().toList().sorted() + capacity
-    var currentWeight: Int
+        listOf(0) + treasures.values.asSequence().filter { it.first <= capacity }.map { it.first }.toSet().toList().sorted()
     var currentItem: String
     var currentValue: Int
+    var currentWeight: Int
     var k: Int
     val table = List(items.size) { List(capacities.size) { mutableMapOf<String, Int>() to mutableListOf<Int>() } }
     for (i in 1 until table.size) {
@@ -332,20 +331,19 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         currentValue = treasures[currentItem]?.second ?: 0
         currentWeight = treasures[currentItem]?.first ?: 0
         for (j in 1 until table[i].size) {
-            if (currentWeight <= capacities[j] && currentValue > table[i - 1][j].second.sum()) {
-                table[i][j].first[currentItem] = currentWeight
-                table[i][j].second.add(currentValue)
+            if (currentWeight <= capacities[j]) {
+                k = capacities.indexOfLast { it <= capacities[j] - currentWeight }
+                k += if (k == -1) 1 else 0
+                if (currentValue + table[i - 1][k].second.sum() > table[i - 1][j].second.sum()) {
+                    table[i][j].first.putAll(table[i - 1][k].first + Pair(currentItem, currentWeight))
+                    table[i][j].second.addAll(table[i - 1][k].second + listOf(currentValue))
+                } else {
+                    table[i][j].first.putAll(table[i - 1][j].first)
+                    table[i][j].second.addAll(table[i - 1][j].second)
+                }
             } else {
-                var prev = listOf(table[i][j - 1], table[i - 1][j]).maxBy { it.second.sum() }
-                table[i][j].first.putAll(prev!!.first)
-                table[i][j].second.addAll(prev.second)
-            }
-            k = capacities.indexOfLast { it <= capacities[j] - currentWeight }
-            if (k > 0 && currentItem !in table[i][k].first.keys && table[i - 1][j].second.sum() < table[i][k].second.sum() + currentValue) {
-                table[i][j].first.clear()
-                table[i][j].second.clear()
-                table[i][j].first.putAll(table[i][k].first + Pair(currentItem, currentWeight))
-                table[i][j].second.addAll(table[i][k].second + currentValue)
+                table[i][j].first.putAll(table[i - 1][j].first)
+                table[i][j].second.addAll(table[i - 1][j].second)
             }
         }
     }
