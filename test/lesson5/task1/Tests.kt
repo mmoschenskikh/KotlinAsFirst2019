@@ -556,14 +556,22 @@ class Tests {
         assertEquals(
             setOf("1", "0"),
             bagPacking(
-                mapOf("0" to (1 to 1), "1" to (495 to 1)), 613
+                mapOf("0" to (1 to 1), "1" to (495 to 1)), 512
+            )
+        )
+        assertEquals(
+            setOf("3", "2", "1", "0"),
+            bagPacking(
+                mapOf("0" to (100 to 1), "1" to (1 to 1), "2" to (1 to 1), "3" to (1 to 1)), 1024
             )
         )
         assertEquals(
             setOf("6", "5", "4", "3", "2", "1", "0"),
             bagPacking(
-                mapOf("0" to (148 to 1), "1" to (1 to 1), "2" to (1 to 1), "3" to (1 to 1),
-                    "4" to (1 to 1), "5" to (1 to 1), "6" to (1 to 1)), 301
+                mapOf(
+                    "0" to (148 to 1), "1" to (1 to 1), "2" to (1 to 1), "3" to (1 to 1),
+                    "4" to (1 to 1), "5" to (1 to 1), "6" to (1 to 1)
+                ), 4096
             )
         )
     }
