@@ -2,6 +2,8 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+
 /**
  * Пример
  *
@@ -42,7 +44,7 @@ fun timeSecondsToStr(seconds: Int): String {
 /**
  * Пример: консольный ввод
  */
-fun main() {
+fun notReallyMain() {
     println("Введите время в формате ЧЧ:ММ:СС")
     val line = readLine()
     if (line != null) {
@@ -69,7 +71,39 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val date = str.split(" ")
+    if (date.size == 3) {
+        val day: Int
+        val month: Int = when (date[1]) {
+            "января" -> 1
+            "февраля" -> 2
+            "марта" -> 3
+            "апреля" -> 4
+            "мая" -> 5
+            "июня" -> 6
+            "июля" -> 7
+            "августа" -> 8
+            "сентября" -> 9
+            "октября" -> 10
+            "ноября" -> 11
+            "декабря" -> 12
+            else -> -1
+        }
+        val year: Int
+        try {
+            day = date[0].toInt()
+            year = date[2].toInt()
+        } catch (e: NumberFormatException) {
+            return ""
+        }
+        if (month != -1 && day in 1..daysInMonth(month, year)) {
+            return String.format("%02d.%02d.%d", day, month, year)
+        }
+
+    }
+    return ""
+}
 
 /**
  * Средняя
@@ -81,7 +115,37 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val date: List<Int>
+    try {
+        date = digital.split(".").map { it.toInt() }
+    } catch (e: java.lang.NumberFormatException) {
+        return ""
+    }
+    if (date.size == 3) {
+        val day = date[0]
+        val month = when (date[1]) {
+            1 -> "января"
+            2 -> "февраля"
+            3 -> "марта"
+            4 -> "апреля"
+            5 -> "мая"
+            6 -> "июня"
+            7 -> "июля"
+            8 -> "августа"
+            9 -> "сентября"
+            10 -> "октября"
+            11 -> "ноября"
+            12 -> "декабря"
+            else -> ""
+        }
+        val year = date[2]
+        if (month != "" && day in 1..daysInMonth(date[1], year)) {
+            return String.format("%d %s %d", day, month, year)
+        }
+    }
+    return ""
+}
 
 /**
  * Средняя
