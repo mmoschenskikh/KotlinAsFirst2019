@@ -295,7 +295,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     set.forEach { if (numbers[it] == null) numbers[it] = list.indexOf(it) }
     list.forEachIndexed { index, it ->
         if (number - it in set && index != numbers[number - it])
-            return Pair(index, list.indexOf(number - it))
+            return Pair(index, numbers[number - it]!!)
     }
     return Pair(-1, -1)
 }
