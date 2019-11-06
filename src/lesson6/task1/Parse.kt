@@ -1,4 +1,4 @@
-@file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence")
+@file:Suppress("UNUSED_PARAMETER", "ConvertCallChainInto Sequence")
 
 package lesson6.task1
 
@@ -201,7 +201,7 @@ fun bestHighJump(jumps: String): Int {
     if (jumps.matches(Regex("""^(\d+ [+%-]+ )*\d+ [+%-]+$"""))) {
         best = Regex("""\d+ [+%-]+""").findAll(jumps).map {
             with(it.value.split(" ")) {
-                this.first().toInt() to this.last().toSet()
+                this[0].toInt() to this[1].toSet()
             }
         }.toMap().filterValues { '+' in it }.maxBy { it.key }?.key ?: -1
     }
@@ -222,7 +222,7 @@ fun plusMinus(expression: String): Int {
         var sum = Regex("""^\d+""").find(expression)!!.value.toInt()
         Regex("""[+-] \d+""").findAll(expression).forEach {
             with(it.value.split(" ")) {
-                sum += this.last().toInt() * if (this.first() == "+") 1 else -1
+                sum += this[1].toInt() * if (this[0] == "+") 1 else -1
             }
         }
         return sum
@@ -240,7 +240,7 @@ fun plusMinus(expression: String): Int {
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String) = Regex("""([а-яА-ЯёЁ]+) \1""").find(str.toLowerCase())?.range?.first ?: -1
 
 /**
  * Сложная
@@ -253,7 +253,16 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше либо равны нуля.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String) =
+    if (description.split("; ").all { Regex("""[\wа-яА-ЯёЁ]+ \d+(\.\d+)?""").matches(it) }) {
+        description.split("; ").map {
+            with(it.split(" ")) {
+                this[0] to this[1].toDouble()
+            }
+        }.toMap().maxBy { it.value }?.key ?: ""
+    } else {
+        ""
+    }
 
 /**
  * Сложная
