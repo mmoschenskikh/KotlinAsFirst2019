@@ -75,7 +75,7 @@ fun dateStrToDigit(str: String): String {
     val date = str.split(" ")
     if (date.size == 3) {
         val day: Int
-        val month: Int = when (date[1]) {
+        val month = when (date[1]) {
             "января" -> 1
             "февраля" -> 2
             "марта" -> 3
@@ -116,9 +116,8 @@ fun dateStrToDigit(str: String): String {
  * входными данными.
  */
 fun dateDigitToStr(digital: String): String {
-    val date: List<Int>
-    try {
-        date = digital.split(".").map { it.toInt() }
+    val date = try {
+        digital.split(".").map { it.toInt() }
     } catch (e: java.lang.NumberFormatException) {
         return ""
     }
@@ -161,7 +160,13 @@ fun dateDigitToStr(digital: String): String {
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String =
+    if (phone.matches(Regex("""^(\+?\d+ *)(\([\d -]+\))?([\d -]+)$"""))) {
+        val list = ('0'..'9').toList() + '+'
+        phone.filter { it in list}
+    } else {
+        ""
+    }
 
 /**
  * Средняя
@@ -173,7 +178,16 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    var best = -1
+    if (jumps.matches(Regex("""^(\d+|[ %-]+)+$"""))) {
+        val results = Regex("""\d+""").findAll(jumps)
+        for (result in results) {
+            best = maxOf(result.value.toInt(), best)
+        }
+    }
+    return best
+}
 
 /**
  * Сложная
