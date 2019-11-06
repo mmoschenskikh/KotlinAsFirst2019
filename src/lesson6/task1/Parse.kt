@@ -44,7 +44,7 @@ fun timeSecondsToStr(seconds: Int): String {
 /**
  * Пример: консольный ввод
  */
-fun notReallyMain() {
+fun main() {
     println("Введите время в формате ЧЧ:ММ:СС")
     val line = readLine()
     if (line != null) {
@@ -160,10 +160,10 @@ fun dateDigitToStr(digital: String): String {
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String =
+fun flattenPhoneNumber(phone: String) =
     if (phone.matches(Regex("""^(\+?\d+ *)(\([\d -]+\))?([\d -]+)$"""))) {
         val list = ('0'..'9').toList() + '+'
-        phone.filter { it in list}
+        phone.filter { it in list }
     } else {
         ""
     }
