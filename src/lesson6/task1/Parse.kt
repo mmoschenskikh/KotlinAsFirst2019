@@ -178,16 +178,12 @@ fun flattenPhoneNumber(phone: String) =
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int {
-    var best = -1
+fun bestLongJump(jumps: String) =
     if (jumps.matches(Regex("""^(\d+|[ %-]+)+$"""))) {
-        val results = Regex("""\d+""").findAll(jumps)
-        for (result in results) {
-            best = maxOf(result.value.toInt(), best)
-        }
+        Regex("""\d+""").findAll(jumps).map { it.value.toInt() }.maxBy { it } ?: -1
+    } else {
+        -1
     }
-    return best
-}
 
 /**
  * Сложная
@@ -200,7 +196,17 @@ fun bestLongJump(jumps: String): Int {
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    var best = -1
+    if (jumps.matches(Regex("""^(\d+ [+%-]+ )*\d+ [+%-]+$"""))) {
+        best = Regex("""\d+ [+%-]+""").findAll(jumps).map {
+            with(it.value.split(" ")) {
+                this.first().toInt() to this.last().toSet()
+            }
+        }.toMap().filterValues { '+' in it }.maxBy { it.key }?.key ?: -1
+    }
+    return best
+}
 
 /**
  * Сложная
@@ -211,7 +217,19 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    if (expression.matches(Regex("""^\d+( [+-] \d+)*$"""))) {
+        var sum = Regex("""^\d+""").find(expression)!!.value.toInt()
+        Regex("""[+-] \d+""").findAll(expression).forEach {
+            with(it.value.split(" ")) {
+                sum += this.last().toInt() * if (this.first() == "+") 1 else -1
+            }
+        }
+        return sum
+    } else {
+        throw IllegalArgumentException()
+    }
+}
 
 /**
  * Сложная
