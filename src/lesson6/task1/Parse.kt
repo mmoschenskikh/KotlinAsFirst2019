@@ -44,7 +44,7 @@ fun timeSecondsToStr(seconds: Int): String {
 /**
  * Пример: консольный ввод
  */
-fun main() {
+fun mainn() {
     println("Введите время в формате ЧЧ:ММ:СС")
     val line = readLine()
     if (line != null) {
@@ -275,7 +275,39 @@ fun mostExpensive(description: String) =
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    val pattern = listOf("^(M{0,3})", "(C[DM]|D?C{0,3})", "(X[LC]|L?X{0,3})", "(I[VX]|V?I{0,3})$")
+    if (Regex(pattern.joinToString(separator = "")).matches(roman)) {
+        val values = listOf(
+            listOf(1000),
+            listOf(900, 400, 500, 100),
+            listOf(90, 40, 50, 10),
+            listOf(9, 4, 5, 1)
+        )
+        val romanNumbers = listOf(
+            listOf("M"),
+            listOf("CM", "CD", "D", "C"),
+            listOf("XC", "XL", "L", "X"),
+            listOf("IX", "IV", "V", "I")
+        )
+        var number = 0
+        for (i in pattern.indices) {
+            var part = Regex(pattern[i]).findAll(roman).filter { it.value.isNotEmpty() }.firstOrNull()?.value ?: ""
+            for (j in romanNumbers[i].indices) {
+                //FIXME
+                if (part != "") {
+                    Regex(romanNumbers[i][j]).findAll(part).forEach {
+                        number += values[i][j]
+                        part = part.replaceFirst(it.value, "")
+                    }
+                }
+            }
+        }
+        return number
+    } else {
+        return -1
+    }
+}
 
 /**
  * Очень сложная

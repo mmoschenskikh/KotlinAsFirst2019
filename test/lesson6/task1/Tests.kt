@@ -1,5 +1,6 @@
 package lesson6.task1
 
+import lesson4.task1.roman
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Tag
@@ -137,6 +138,12 @@ class Tests {
         assertEquals(694, fromRoman("DCXCIV"))
         assertEquals(49, fromRoman("XLIX"))
         assertEquals(-1, fromRoman("Z"))
+        assertEquals(1609, fromRoman("MDCIX"))
+        for (i in 1..50) {
+            val k = (1..3000).random()
+            println("$i. Random number is $k; It's roman form is ${roman(k)}; Number from roman is ${fromRoman(roman(k))}")
+            assertEquals(k, fromRoman(roman(k)))
+        }
     }
 
     @Test
