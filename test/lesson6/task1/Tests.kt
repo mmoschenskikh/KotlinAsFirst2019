@@ -138,10 +138,10 @@ class Tests {
         assertEquals(694, fromRoman("DCXCIV"))
         assertEquals(49, fromRoman("XLIX"))
         assertEquals(-1, fromRoman("Z"))
+        assertEquals(-1, fromRoman("XDXCXMLMCMDM"))
         assertEquals(1609, fromRoman("MDCIX"))
-        for (i in 1..50) {
+        for (i in 1..1000) {
             val k = (1..3000).random()
-            println("$i. Random number is $k; It's roman form is ${roman(k)}; Number from roman is ${fromRoman(roman(k))}")
             assertEquals(k, fromRoman(roman(k)))
         }
     }

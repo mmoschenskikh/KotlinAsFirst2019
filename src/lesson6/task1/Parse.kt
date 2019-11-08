@@ -44,7 +44,7 @@ fun timeSecondsToStr(seconds: Int): String {
 /**
  * Пример: консольный ввод
  */
-fun mainn() {
+fun main() {
     println("Введите время в формате ЧЧ:ММ:СС")
     val line = readLine()
     if (line != null) {
@@ -290,20 +290,21 @@ fun fromRoman(roman: String): Int {
             listOf("XC", "XL", "L", "X"),
             listOf("IX", "IV", "V", "I")
         )
-        var number = 0
-        for (i in pattern.indices) {
-            var part = Regex(pattern[i]).findAll(roman).filter { it.value.isNotEmpty() }.firstOrNull()?.value ?: ""
+        var romanForm = roman
+        var result = 0
+        for (i in pattern.size - 1 downTo 0) {
+            var part = Regex(pattern[i]).findAll(romanForm).filter { it.value.isNotEmpty() }.firstOrNull()?.value ?: ""
             for (j in romanNumbers[i].indices) {
-                //FIXME
                 if (part != "") {
                     Regex(romanNumbers[i][j]).findAll(part).forEach {
-                        number += values[i][j]
+                        result += values[i][j]
                         part = part.replaceFirst(it.value, "")
+                        romanForm = romanForm.replaceFirst(it.value, "")
                     }
                 }
             }
         }
-        return number
+        return result
     } else {
         return -1
     }
