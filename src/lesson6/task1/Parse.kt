@@ -240,7 +240,7 @@ fun plusMinus(expression: String): Int {
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String) = Regex("""([а-яА-ЯёЁ]+) \1""").find(str.toLowerCase())?.range?.first ?: -1
+fun firstDuplicateIndex(str: String) = Regex("""(.+) \1""").find(str.toLowerCase())?.range?.first ?: -1
 
 /**
  * Сложная
@@ -254,7 +254,7 @@ fun firstDuplicateIndex(str: String) = Regex("""([а-яА-ЯёЁ]+) \1""").find(
  * Все цены должны быть больше либо равны нуля.
  */
 fun mostExpensive(description: String) =
-    if (description.split("; ").all { Regex("""[\wа-яА-ЯёЁ]+ \d+(\.\d+)?""").matches(it) }) {
+    if (description.split("; ").all { Regex(""".+ \d+(\.\d+)?""").matches(it) }) {
         description.split("; ").map {
             with(it.split(" ")) {
                 this[0] to this[1].toDouble()
@@ -277,7 +277,7 @@ fun mostExpensive(description: String) =
  */
 fun fromRoman(roman: String): Int {
     val pattern = listOf("^(M{0,3})", "(C[DM]|D?C{0,3})", "(X[LC]|L?X{0,3})", "(I[VX]|V?I{0,3})$")
-    if (Regex(pattern.joinToString(separator = "")).matches(roman)) {
+    if (Regex(pattern.joinToString(separator = "")).matches(roman) && roman.isNotEmpty()) {
         val values = listOf(
             listOf(1000),
             listOf(900, 400, 500, 100),

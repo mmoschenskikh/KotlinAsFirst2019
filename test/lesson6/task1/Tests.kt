@@ -112,6 +112,7 @@ class Tests {
     @Test
     @Tag("Hard")
     fun firstDuplicateIndex() {
+        assertEquals(0, firstDuplicateIndex("a a"))
         assertEquals(-1, firstDuplicateIndex(""))
         assertEquals(-1, firstDuplicateIndex("Привет"))
         assertEquals(9, firstDuplicateIndex("Он пошёл в в школу"))
@@ -122,6 +123,7 @@ class Tests {
     @Test
     @Tag("Hard")
     fun mostExpensive() {
+        assertEquals("%", mostExpensive("% 0"))
         assertEquals("", mostExpensive(""))
         assertEquals("Курица", mostExpensive("Хлеб 39.9; Молоко 62.5; Курица 184.0; Конфеты 89.9"))
         assertEquals("", mostExpensive("Хлеб 39.9; Молоко 62.5; Курица 184.0; Конфеты 89.9; "))
@@ -132,6 +134,7 @@ class Tests {
     @Test
     @Tag("Hard")
     fun fromRoman() {
+        assertEquals(-1, fromRoman(""))
         assertEquals(1, fromRoman("I"))
         assertEquals(3000, fromRoman("MMM"))
         assertEquals(1978, fromRoman("MCMLXXVIII"))
