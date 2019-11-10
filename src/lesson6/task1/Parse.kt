@@ -161,7 +161,7 @@ fun dateDigitToStr(digital: String): String {
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
 fun flattenPhoneNumber(phone: String) =
-    if (phone.matches(Regex("""^(\+?\d+ *)(\([\d -]+\))?([\d -]+)$"""))) {
+    if (phone.matches(Regex("""^(\+?\d+ *)?(\([\d -]+\))?([\d -]+)$"""))) {
         val list = ('0'..'9').toList() + '+'
         phone.filter { it in list }
     } else {
@@ -240,7 +240,7 @@ fun plusMinus(expression: String): Int {
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String) = Regex("""(.+) \1""").find(str.toLowerCase())?.range?.first ?: -1
+fun firstDuplicateIndex(str: String) = Regex("""([\wа-яА-ЯёЁ]+) \1""").find(str.toLowerCase())?.range?.first ?: -1
 
 /**
  * Сложная
