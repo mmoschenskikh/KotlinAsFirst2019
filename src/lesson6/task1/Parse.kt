@@ -346,4 +346,74 @@ fun fromRoman(roman: String): Int {
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    if (isValidExpression(commands)) {
+        val braces = braceScanner(commands)
+        val state = MutableList(cells) { 0 }
+        var count = 0 // число выполненных команд
+        var command = 0 // индекс инструкции в commands
+        var position = cells / 2
+        while (count < limit && command < commands.length) {
+            try {
+                when (commands[command]) {
+                    '>' -> position += 1
+                    '<' -> position -= 1
+                    '+' -> state[position] += 1
+                    '-' -> state[position] -= 1
+                    '[' -> if (state[position] == 0) {
+                        command = braces.getValue(command)
+                    }
+                    ']' -> if (state[position] != 0) {
+                        command = braces.getValue(command)
+                    }
+                }
+                state[position]
+            } catch (e: IndexOutOfBoundsException) {
+                throw IllegalStateException()
+            }
+            count++
+            command++
+        }
+        return state
+    } else {
+        throw IllegalArgumentException()
+    }
+}
+
+fun braceScanner(commands: String): Map<Int, Int> {
+    var depth = 0
+    val output = mutableMapOf<Int, Int>()
+    val braces = commands.toMutableList().mapIndexed { index, char ->
+        when (char) {
+            '[' -> depth += 1
+            ']' -> depth -= 1
+        }
+        index to depth
+    }.filter { commands[it.first] in "[]" }
+    for (i in braces.indices) {
+        if (braces[i].first !in output.values) {
+            val pair = braces.first { it.second == braces[i].second - 1 && it.first !in output.keys }.first
+            output[braces[i].first] = pair
+            output[pair] = braces[i].first
+        }
+    }
+    return output
+}
+
+fun isValidExpression(commands: String): Boolean {
+    var rightBraces = 0
+    var leftBraces = 0
+    if (Regex("""^[\[\] <>+-]+$""").matches(commands)) {
+        val onlyBraces = commands.filter { it in "[]" }.toList()
+        for (char in onlyBraces) {
+            when (char) {
+                '[' -> leftBraces += 1
+                ']' -> rightBraces += 1
+            }
+            if (rightBraces > leftBraces) return false
+        }
+        return rightBraces == leftBraces
+    } else {
+        return false
+    }
+}
