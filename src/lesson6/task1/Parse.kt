@@ -356,10 +356,10 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
         while (count < limit && command < commands.length) {
             try {
                 when (commands[command]) {
-                    '>' -> position += 1
-                    '<' -> position -= 1
-                    '+' -> state[position] += 1
-                    '-' -> state[position] -= 1
+                    '>' -> position++
+                    '<' -> position--
+                    '+' -> state[position]++
+                    '-' -> state[position]--
                     '[' -> if (state[position] == 0) {
                         command = braces.getValue(command)
                     }
@@ -385,8 +385,8 @@ fun braceScanner(commands: String): Map<Int, Int> {
     val output = mutableMapOf<Int, Int>()
     val braces = commands.toMutableList().mapIndexed { index, char ->
         when (char) {
-            '[' -> depth += 1
-            ']' -> depth -= 1
+            '[' -> depth++
+            ']' -> depth--
         }
         index to depth
     }.filter { commands[it.first] in "[]" }
@@ -407,8 +407,8 @@ fun isValidExpression(commands: String): Boolean {
         val onlyBraces = commands.filter { it in "[]" }.toList()
         for (char in onlyBraces) {
             when (char) {
-                '[' -> leftBraces += 1
-                ']' -> rightBraces += 1
+                '[' -> leftBraces++
+                ']' -> rightBraces++
             }
             if (rightBraces > leftBraces) return false
         }
