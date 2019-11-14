@@ -2,6 +2,7 @@
 
 package lesson7.task1
 
+import lesson3.task1.digitNumber
 import java.io.File
 
 /**
@@ -53,7 +54,22 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    //FIXME
+    val suitableWords = mutableListOf<String>()
+    File(inputName).readLines().forEach { line ->
+        substrings.forEach { string ->
+            suitableWords.addAll(
+                Regex(string, RegexOption.IGNORE_CASE)
+                    .findAll(line)
+                    .map { result -> result.value.toLowerCase() }
+            )
+        }
+    }
+    return substrings.map { string ->
+        string to suitableWords.filter { it == string.toLowerCase() }.size
+    }.toMap()
+}
 
 
 /**
@@ -69,9 +85,21 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  * Исключения (жюри, брошюра, парашют) в рамках данного задания обрабатывать не нужно
  *
  */
-fun sibilants(inputName: String, outputName: String) {
-    TODO()
-}
+fun sibilants(inputName: String, outputName: String) =
+    File(outputName).bufferedWriter().use {
+        File(inputName).readLines().forEach { string ->
+            it.write(
+                Regex("""[ЖжЧчШшЩщ][ЫыЯяЮю]""").replace(string) { match ->
+                    match.value.first() + when (match.value.last().toLowerCase()) {
+                        'ы' -> "и"
+                        'я' -> "а"
+                        else -> "у"
+                    }.run { if (match.value.last().isUpperCase()) toUpperCase() else toLowerCase() }
+                }
+            )
+            it.newLine()
+        }
+    }
 
 /**
  * Средняя
@@ -181,7 +209,24 @@ fun top20Words(inputName: String): Map<String, Int> = TODO()
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    TODO()
+    val searchFor = dictionary.keys.joinToString(separator = "|")
+    File(outputName).bufferedWriter().use {
+        File(inputName).bufferedReader().readLines().forEach { string ->
+            it.write(
+                Regex(searchFor, RegexOption.IGNORE_CASE).replace(string) { match ->
+                    (dictionary[match.value.first().toUpperCase()] ?: dictionary[match.value.first().toLowerCase()])!!
+                        .toLowerCase()
+                        .run {
+                            (if (match.value.first().isUpperCase())
+                                this.first().toUpperCase()
+                            else
+                                this.first().toLowerCase()) + this.substring(1)
+                        }
+                }
+            )
+            it.newLine()
+        }
+    }
 }
 
 /**
@@ -244,15 +289,15 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  *
  * Соответствующий выходной файл:
 <html>
-    <body>
-        <p>
-            Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
-            Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
-        </p>
-        <p>
-            Suspendisse <s>et elit in enim tempus iaculis</s>.
-        </p>
-    </body>
+<body>
+<p>
+Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
+Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
+</p>
+<p>
+Suspendisse <s>et elit in enim tempus iaculis</s>.
+</p>
+</body>
 </html>
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
@@ -295,67 +340,67 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  *
  * Пример входного файла:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
-* Утка по-пекински
-    * Утка
-    * Соус
-* Салат Оливье
-    1. Мясо
-        * Или колбаса
-    2. Майонез
-    3. Картофель
-    4. Что-то там ещё
-* Помидоры
-* Фрукты
-    1. Бананы
-    23. Яблоки
-        1. Красные
-        2. Зелёные
+ * Утка по-пекински
+ * Утка
+ * Соус
+ * Салат Оливье
+1. Мясо
+ * Или колбаса
+2. Майонез
+3. Картофель
+4. Что-то там ещё
+ * Помидоры
+ * Фрукты
+1. Бананы
+23. Яблоки
+1. Красные
+2. Зелёные
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  *
  *
  * Соответствующий выходной файл:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
 <html>
-  <body>
-    <ul>
-      <li>
-        Утка по-пекински
-        <ul>
-          <li>Утка</li>
-          <li>Соус</li>
-        </ul>
-      </li>
-      <li>
-        Салат Оливье
-        <ol>
-          <li>Мясо
-            <ul>
-              <li>
-                  Или колбаса
-              </li>
-            </ul>
-          </li>
-          <li>Майонез</li>
-          <li>Картофель</li>
-          <li>Что-то там ещё</li>
-        </ol>
-      </li>
-      <li>Помидоры</li>
-      <li>
-        Фрукты
-        <ol>
-          <li>Бананы</li>
-          <li>
-            Яблоки
-            <ol>
-              <li>Красные</li>
-              <li>Зелёные</li>
-            </ol>
-          </li>
-        </ol>
-      </li>
-    </ul>
-  </body>
+<body>
+<ul>
+<li>
+Утка по-пекински
+<ul>
+<li>Утка</li>
+<li>Соус</li>
+</ul>
+</li>
+<li>
+Салат Оливье
+<ol>
+<li>Мясо
+<ul>
+<li>
+Или колбаса
+</li>
+</ul>
+</li>
+<li>Майонез</li>
+<li>Картофель</li>
+<li>Что-то там ещё</li>
+</ol>
+</li>
+<li>Помидоры</li>
+<li>
+Фрукты
+<ol>
+<li>Бананы</li>
+<li>
+Яблоки
+<ol>
+<li>Красные</li>
+<li>Зелёные</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+</body>
 </html>
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
@@ -382,29 +427,61 @@ fun markdownToHtml(inputName: String, outputName: String) {
  * Вывести в выходной файл процесс умножения столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 111):
-   19935
-*    111
+19935
+ *    111
 --------
-   19935
+19935
 + 19935
 +19935
 --------
- 2212785
+2212785
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  * Нули в множителе обрабатывать так же, как и остальные цифры:
-  235
-*  10
+235
+ *  10
 -----
-    0
+0
 +235
 -----
- 2350
+2350
  *
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    val result = lhv * rhv
+    val width = digitNumber(result) + 1
+    val digits = rhv.toString().toList().map { it.toString().toInt() }.reversed()
+    File(outputName).bufferedWriter().use {
+        it.write(String.format("%${width}d", lhv))
+        it.newLine()
+        it.write(String.format("*%${width - 1}d", rhv))
+        it.newLine()
+        it.write('-' * width)
+        it.newLine()
+        it.write(String.format("%${width}d", lhv * digits[0]))
+        var i = width - 2
+        for (digit in digits.subList(1, digits.size)) {
+            it.newLine()
+            it.write(String.format("+%${i}d", lhv * digit))
+            i--
+        }
+        it.newLine()
+        it.write('-' * width)
+        it.newLine()
+        it.write(String.format("%${width}d", result))
+    }
 }
 
+operator fun Char.times(multiplier: Int): String =
+    List(multiplier) { this }.joinToString(separator = "")
+
+operator fun Int.times(char: Char): String =
+    List(this) { char }.joinToString(separator = "")
+
+operator fun CharSequence.times(multiplier: Int): String =
+    List(multiplier) { this }.joinToString(separator = "")
+
+operator fun Int.times(charSequence: CharSequence): String =
+    List(this) { charSequence }.joinToString(separator = "")
 
 /**
  * Сложная
@@ -412,16 +489,16 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Вывести в выходной файл процесс деления столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 22):
-  19935 | 22
- -198     906
- ----
-    13
-    -0
-    --
-    135
-   -132
-   ----
-      3
+19935 | 22
+-198     906
+----
+13
+-0
+--
+135
+-132
+----
+3
 
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
