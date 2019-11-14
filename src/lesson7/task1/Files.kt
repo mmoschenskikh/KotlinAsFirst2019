@@ -89,12 +89,13 @@ fun sibilants(inputName: String, outputName: String) =
     File(outputName).bufferedWriter().use {
         File(inputName).readLines().forEach { string ->
             it.write(
-                Regex("""[ЖжЧчШшЩщ][ЫыЯяЮю]""").replace(string) { match ->
-                    match.value.first() + when (match.value.last().toLowerCase()) {
+                Regex("""[ЖжЧчШшЩщ][ЫыЯяЮю]""").replace(string) { found ->
+                    val match = found.value[0] to found.value[1] // Всегда находятся ровно две буквы
+                    match.first + when (match.second.toLowerCase()) {
                         'ы' -> "и"
                         'я' -> "а"
                         else -> "у"
-                    }.run { if (match.value.last().isUpperCase()) toUpperCase() else toLowerCase() }
+                    }.run { if (match.second.isUpperCase()) this.toUpperCase() else this }
                 }
             )
             it.newLine()
@@ -171,7 +172,23 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  * Ключи в ассоциативном массиве должны быть в нижнем регистре.
  *
  */
-fun top20Words(inputName: String): Map<String, Int> = TODO()
+fun top20Words(inputName: String): Map<String, Int> {
+    val top20 = mutableMapOf<String, Int>()
+    File(inputName).bufferedReader().readLines().forEach { string ->
+        Regex("""[a-zA-Zа-яА-ЯёЁ]+""").findAll(string)
+            .map { it.value.toLowerCase() }
+            .forEach { word ->
+                top20[word] = top20.getOrDefault(word, 0) + 1
+            }
+    }
+    return with(top20.toList().sortedByDescending { it.second }) {
+        try {
+            this.subList(0, 20).toMap()
+        } catch (e: IndexOutOfBoundsException) {
+            this.toMap()
+        }
+    }
+}
 
 /**
  * Средняя
@@ -209,19 +226,19 @@ fun top20Words(inputName: String): Map<String, Int> = TODO()
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
+    val dict = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }.toMap()
     val searchFor = dictionary.keys.joinToString(separator = "|")
     File(outputName).bufferedWriter().use {
         File(inputName).bufferedReader().readLines().forEach { string ->
             it.write(
-                Regex(searchFor, RegexOption.IGNORE_CASE).replace(string) { match ->
-                    (dictionary[match.value.first().toUpperCase()] ?: dictionary[match.value.first().toLowerCase()])!!
-                        .toLowerCase()
-                        .run {
-                            (if (match.value.first().isUpperCase())
-                                this.first().toUpperCase()
-                            else
-                                this.first().toLowerCase()) + this.substring(1)
-                        }
+                Regex(searchFor, RegexOption.IGNORE_CASE).replace(string) { found ->
+                    val match = found.value.first() // Всегда находится ровно один символ
+                    with(dict.getValue(match.toLowerCase())) {
+                        (if (match.isUpperCase())
+                            this.first().toUpperCase()
+                        else
+                            this.first()) + this.substring(1)
+                    }
                 }
             )
             it.newLine()
