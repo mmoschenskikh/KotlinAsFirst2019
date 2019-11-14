@@ -72,6 +72,14 @@ Basic, Ruby, Swift.
             mapOf("--" to 4, "ее" to 2, "животное" to 2, "." to 2),
             countSubstrings("input/substrings_in2.txt", listOf("--", "ее", "животное", "."))
         )
+        assertEquals(
+            mapOf("--" to 0, "ее" to 0, "животное" to 0, "." to 0),
+            countSubstrings("input/empty.txt", listOf("--", "ее", "животное", "."))
+        )
+        assertEquals(
+            mapOf<String, Int>(),
+            countSubstrings("input/align_in1.txt", listOf())
+        )
     }
 
     @Test
@@ -96,6 +104,10 @@ Basic, Ruby, Swift.
  */"""
         )
         File("temp.txt").delete()
+
+        sibilants("input/empty.txt", "temp.txt")
+        assertFileContent("temp.txt", "")
+        File("temp.txt").delete()
     }
 
     @Test
@@ -115,6 +127,9 @@ Basic, Ruby, Swift.
         )
         File("temp.txt").delete()
 
+        centerFile("input/empty.txt", "temp.txt")
+        assertFileContent("temp.txt", "")
+        File("temp.txt").delete()
     }
 
     @Test
@@ -206,6 +221,26 @@ Basic, Ruby, Swift.
         )
         assertFileContent("temp.txt", "Zzdrавствуy,\nmyyr!!!")
         File("temp.txt").delete()
+
+        transliterate(
+            "input/empty.txt",
+            mapOf('з' to "zZ", 'р' to "r", 'д' to "d", 'й' to "y", 'М' to "m", 'и' to "YY", '!' to "!!!"),
+            "temp.txt"
+        )
+        assertFileContent("temp.txt", "")
+        File("temp.txt").delete()
+
+        transliterate(
+            "input/trans_in1.txt",
+            mapOf(),
+            "temp.txt"
+        )
+        assertFileContent(
+            "temp.txt",
+            "Здравствуй,\n" +
+                    "мир!"
+        )
+        File("temp.txt").delete()
     }
 
     @Test
@@ -213,6 +248,10 @@ Basic, Ruby, Swift.
     fun chooseLongestChaoticWord() {
         chooseLongestChaoticWord("input/chaotic_in1.txt", "temp.txt")
         assertFileContent("temp.txt", "Карминовый, Некрасивый")
+        File("temp.txt").delete()
+
+        chooseLongestChaoticWord("input/empty.txt", "temp.txt")
+        assertFileContent("temp.txt", "")
         File("temp.txt").delete()
     }
 

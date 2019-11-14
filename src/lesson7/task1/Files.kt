@@ -55,20 +55,21 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  *
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
-    //FIXME
-    val suitableWords = mutableListOf<String>()
+    val output = substrings.map { it to 0 }.toMap().toMutableMap()
     File(inputName).readLines().forEach { line ->
-        substrings.forEach { string ->
-            suitableWords.addAll(
-                Regex(string, RegexOption.IGNORE_CASE)
-                    .findAll(line)
-                    .map { result -> result.value.toLowerCase() }
-            )
+        val string = line.toLowerCase()
+        substrings.forEach { substring ->
+            for (i in string.indices) {
+                if (
+                    substring.length + i <= string.length &&
+                    string.substring(i, i + substring.length) == substring.toLowerCase()
+                ) {
+                    output[substring] = output.getValue(substring) + 1
+                }
+            }
         }
     }
-    return substrings.map { string ->
-        string to suitableWords.filter { it == string.toLowerCase() }.size
-    }.toMap()
+    return output
 }
 
 
@@ -87,9 +88,9 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  */
 fun sibilants(inputName: String, outputName: String) =
     File(outputName).bufferedWriter().use {
-        File(inputName).readLines().forEach { string ->
+        File(inputName).readLines().forEach { line ->
             it.write(
-                Regex("""[ЖжЧчШшЩщ][ЫыЯяЮю]""").replace(string) { found ->
+                Regex("""[ЖжЧчШшЩщ][ЫыЯяЮю]""").replace(line) { found ->
                     val match = found.value[0] to found.value[1] // Всегда находятся ровно две буквы
                     match.first + when (match.second.toLowerCase()) {
                         'ы' -> "и"
@@ -120,7 +121,16 @@ fun sibilants(inputName: String, outputName: String) =
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    val inputStream = File(inputName).readLines()
+    val maxLength = inputStream.maxBy { it.length }?.length ?: 0
+    File(outputName).bufferedWriter().use {
+        inputStream.forEach { line ->
+            val string = line.trim()
+            val length = (maxLength + string.length) / 2
+            it.write(String.format("%${length}s", string))
+            it.newLine()
+        }
+    }
 }
 
 /**
@@ -144,7 +154,7 @@ fun centerFile(inputName: String, outputName: String) {
  * 6) Число пробелов между более левой парой соседних слов должно быть больше или равно числу пробелов
  *    между более правой парой соседних слов.
  *
- * Следует учесть, что входной файл может содержать последовательности из нескольких пробелов  между слвоами. Такие
+ * Следует учесть, что входной файл может содержать последовательности из нескольких пробелов между словами. Такие
  * последовательности следует учитывать при выравнивании и при необходимости избавляться от лишних пробелов.
  * Из этого следуют следующие правила:
  * 7) В самой длинной строке каждая пара соседних слов должна быть отделена В ТОЧНОСТИ одним пробелом
@@ -173,15 +183,15 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  *
  */
 fun top20Words(inputName: String): Map<String, Int> {
-    val top20 = mutableMapOf<String, Int>()
-    File(inputName).bufferedReader().readLines().forEach { string ->
-        Regex("""[a-zA-Zа-яА-ЯёЁ]+""").findAll(string)
+    val top = mutableMapOf<String, Int>()
+    File(inputName).readLines().forEach { line ->
+        Regex("""[a-zA-Zа-яА-ЯёЁ]+""").findAll(line)
             .map { it.value.toLowerCase() }
             .forEach { word ->
-                top20[word] = top20.getOrDefault(word, 0) + 1
+                top[word] = top.getOrDefault(word, 0) + 1
             }
     }
-    return with(top20.toList().sortedByDescending { it.second }) {
+    return with(top.toList().sortedByDescending { it.second }) {
         try {
             this.subList(0, 20).toMap()
         } catch (e: IndexOutOfBoundsException) {
@@ -226,22 +236,28 @@ fun top20Words(inputName: String): Map<String, Int> {
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    val dict = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }.toMap()
-    val searchFor = dictionary.keys.joinToString(separator = "|")
-    File(outputName).bufferedWriter().use {
-        File(inputName).bufferedReader().readLines().forEach { string ->
-            it.write(
-                Regex(searchFor, RegexOption.IGNORE_CASE).replace(string) { found ->
-                    val match = found.value.first() // Всегда находится ровно один символ
-                    with(dict.getValue(match.toLowerCase())) {
-                        (if (match.isUpperCase())
-                            this.first().toUpperCase()
-                        else
-                            this.first()) + this.substring(1)
+    if (dictionary.isNotEmpty()) {
+        val dict = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }.toMap()
+        val searchFor = dictionary.keys.joinToString(separator = "|")
+        File(outputName).bufferedWriter().use {
+            File(inputName).readLines().forEach { line ->
+                it.write(
+                    Regex(searchFor, RegexOption.IGNORE_CASE).replace(line) { found ->
+                        val match = found.value.first() // Всегда находится ровно один символ
+                        with(dict.getValue(match.toLowerCase())) {
+                            (if (match.isUpperCase())
+                                this.first().toUpperCase()
+                            else
+                                this.first()) + this.substring(1)
+                        }
                     }
-                }
-            )
-            it.newLine()
+                )
+                it.newLine()
+            }
+        }
+    } else {
+        File(outputName).bufferedWriter().use {
+            it.write(File(inputName).readText())
         }
     }
 }
@@ -271,7 +287,17 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    TODO()
+    val wordList = mutableListOf<String>()
+    File(inputName).readLines().forEach {
+        val word = it.toLowerCase()
+        if (word.toSet().size == word.length) {
+            wordList.add(it)
+        }
+    }
+    val output = wordList.groupBy { it.length }.maxBy { it.key }?.value?.joinToString() ?: ""
+    File(outputName).bufferedWriter().use {
+        it.write(output)
+    }
 }
 
 /**
@@ -523,4 +549,3 @@ operator fun Int.times(charSequence: CharSequence): String =
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     TODO()
 }
-
