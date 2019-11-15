@@ -266,30 +266,27 @@ fun top20Words(inputName: String): Map<String, Int> {
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
     if (dictionary.isNotEmpty()) {
+        val text = File(inputName).readText()
         val dict = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }.toMap()
-        val searchFor =
-            dictionary.keys.joinToString(separator = """|""") {
-                if (it !in ('a'..'z') + ('A'..'Z') + ('0'..'9')) """\""" + it else it.toString()
-            }
+        val searchFor = dictionary.keys.joinToString(separator = """|""") { Regex.escape(it.toString()) }
         File(outputName).bufferedWriter().use {
-            File(inputName).readLines().forEach { line ->
-                it.write(
-                    Regex(searchFor, RegexOption.IGNORE_CASE).replace(line) { found ->
-                        val match = found.value.first() // Всегда находится ровно один символ
-                        with(dict.getValue(match.toLowerCase())) {
-                            if (this.isNotEmpty()) {
-                                (if (match.isUpperCase())
-                                    this.first().toUpperCase()
-                                else
-                                    this.first()) + this.substring(1)
-                            } else {
-                                ""
-                            }
+            it.write(
+                Regex(searchFor, RegexOption.IGNORE_CASE).replace(text) { found ->
+                    val match = found.value.first() // Всегда находится ровно один символ
+                    with(dict.getValue(match.toLowerCase())) {
+                        if (this.isNotEmpty()) {
+                            (if (match.isUpperCase())
+                                this.first().toUpperCase()
+                            else
+                                this.first()) + this.substring(1)
+                        } else {
+                            ""
                         }
                     }
-                )
-                it.newLine()
-            }
+                }
+            )
+            it.newLine()
+
         }
     } else {
         File(outputName).bufferedWriter().use {
@@ -592,7 +589,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         var strSubtrahend = "-$subtrahend"
         var remainder = minuend - subtrahend
         var gap = 2 + width - digitNumber(subtrahend)
-        if ((digitsTaken == digits.size|| minuend < rhv) && strMinuend.length >= strSubtrahend.length ) {
+        if ((digitsTaken == digits.size || minuend < rhv) && strMinuend.length >= strSubtrahend.length) {
             val shift = if (digitsTaken >= strSubtrahend.length) digitsTaken - strSubtrahend.length else 0
             width -= 1
             it.write(String.format("%${width}d | %d\n", lhv, rhv))

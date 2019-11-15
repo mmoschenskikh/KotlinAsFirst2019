@@ -270,8 +270,12 @@ TEW                                      DEW"""
         assertFileContent("temp.txt", "a")
         File("temp.txt").delete()
 
-        transliterate("input/trans_in2.txt", mapOf('0' to "a"), "temp.txt")
+        transliterate("input/trans_in2.txt", mapOf('0' to "A"), "temp.txt")
         assertFileContent("temp.txt", "a")
+        File("temp.txt").delete()
+
+        transliterate("input/trans_in3.txt", mapOf('\n' to "/B"), "temp.txt")
+        assertFileContent("temp.txt", "/b")
         File("temp.txt").delete()
     }
 
