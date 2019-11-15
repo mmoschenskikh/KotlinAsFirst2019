@@ -265,6 +265,10 @@ TEW                                      DEW"""
         transliterate("input/trans_in2.txt", mapOf('a' to ""), "temp.txt")
         assertFileContent("temp.txt", "")
         File("temp.txt").delete()
+
+        transliterate("input/trans_in2.txt", mapOf('?' to "a"), "temp.txt")
+        assertFileContent("temp.txt", "a")
+        File("temp.txt").delete()
     }
 
     @Test
@@ -439,7 +443,22 @@ TEW                                      DEW"""
             assertFileContent("temp.txt", res.trimIndent())
             File("temp.txt").delete()
         }
-
+        test(
+            19935,
+            22,
+            """
+              19935 | 22
+             -198     906
+             ----
+                13
+                -0
+                --
+                135
+               -132
+               ----
+                  3
+             """
+        )
         test(
             2,
             20,
@@ -475,22 +494,6 @@ TEW                                      DEW"""
         )
 
         test(
-            19935,
-            22,
-            """
-              19935 | 22
-             -198     906
-             ----
-                13
-                -0
-                --
-                135
-               -132
-               ----
-                  3
-             """
-        )
-        test(
             705324,
             1,
             """
@@ -514,6 +517,15 @@ TEW                                      DEW"""
      --
       0"""
         )
+        test(
+            143078,
+            77976,
+            """
+  143078 | 77976
+  -77976   1
+  ------
+   65102"""
+        )
 
         fun pdp(num1: Int, num2: Int) {
             printDivisionProcess(num1, num2, "temp.txt")
@@ -527,6 +539,7 @@ TEW                                      DEW"""
         pdp(558, 18)
         pdp(6344, 61)
         pdp(0, 239)
+        pdp(143078, 77976)
         assertThrows(ArithmeticException::class.java) { printDivisionProcess(13280, 0, "temp.txt") }
 
         File("temp.txt").delete()

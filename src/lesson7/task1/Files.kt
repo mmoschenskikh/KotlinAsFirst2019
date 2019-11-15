@@ -267,7 +267,8 @@ fun top20Words(inputName: String): Map<String, Int> {
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
     if (dictionary.isNotEmpty()) {
         val dict = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }.toMap()
-        val searchFor = dictionary.keys.joinToString(separator = "|")
+        val searchFor =
+            dictionary.keys.joinToString(separator = """|""") { if (it !in 'a'..'z' && it !in 'A'..'Z') """\""" + it else it.toString() }
         File(outputName).bufferedWriter().use {
             File(inputName).readLines().forEach { line ->
                 it.write(
@@ -575,36 +576,44 @@ operator fun Int.times(charSequence: CharSequence): String =
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val result = lhv / rhv
-    val width = digitNumber(lhv) + 1
+    var width = digitNumber(lhv) + 1
     val digits = lhv.toString().toList().map { it.toString() }
     File(outputName).bufferedWriter().use {
         var minuend = 0
-        var strMinuend = "$minuend"
         var digitsTaken = 0
         while (minuend < rhv && digitsTaken < digits.size) {
             minuend = digits.subList(0, digitsTaken + 1).joinToString(separator = "").toInt()
             digitsTaken++
         }
+        var strMinuend = "$minuend"
         var subtrahend = minuend - minuend % rhv
         var strSubtrahend = "-$subtrahend"
         var remainder = minuend - subtrahend
-        var shift = 2 + width - digitNumber(subtrahend)
-        it.write(String.format("%${width}d | %d\n", lhv, rhv))
-        it.write(strSubtrahend + ' ' * shift + "$result\n")
-        it.write('-' * (digitNumber(subtrahend) + 1) + '\n')
+        var gap = 2 + width - digitNumber(subtrahend)
+        if (digitsTaken == digits.size && strMinuend.length == strSubtrahend.length) {
+            val shift = strMinuend.length - strSubtrahend.length
+            width -= 1
+            it.write(String.format("%${width}d | %d\n", lhv, rhv))
+            it.write(' ' * shift + strSubtrahend + ' ' * 3 + "$result\n")
+            it.write(' ' * shift + '-' * (strSubtrahend.length) + '\n')
+        } else {
+            it.write(String.format("%${width}d | %d\n", lhv, rhv))
+            it.write(strSubtrahend + ' ' * gap + "$result\n")
+            it.write('-' * (strSubtrahend.length) + '\n')
+        }
         while (digitsTaken < digits.size) {
             if (remainder < rhv) {
                 strMinuend = remainder.toString() + digits[digitsTaken]
                 minuend = strMinuend.toInt()
             }
-            shift = 2 + digitsTaken
+            gap = 2 + digitsTaken
             subtrahend = minuend - minuend % rhv
             strSubtrahend = "-$subtrahend"
             remainder = minuend - subtrahend
             digitsTaken++
-            it.write(String.format("%${shift}s\n", strMinuend))
-            it.write(String.format("%${shift}s\n", strSubtrahend))
-            it.write(String.format("%${shift}s\n", '-' * maxOf(strMinuend.length, strSubtrahend.length)))
+            it.write(String.format("%${gap}s\n", strMinuend))
+            it.write(String.format("%${gap}s\n", strSubtrahend))
+            it.write(String.format("%${gap}s\n", '-' * maxOf(strMinuend.length, strSubtrahend.length)))
         }
         it.write(String.format("%${width}d", remainder))
     }
