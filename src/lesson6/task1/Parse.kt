@@ -259,7 +259,7 @@ fun mostExpensive(description: String) =
             with(it.split(" ")) {
                 this[0] to this[1].toDouble()
             }
-        }.toMap().maxBy { it.value }?.key ?: ""
+        }.maxBy { it.second }?.first ?: ""
     } else {
         ""
     }
