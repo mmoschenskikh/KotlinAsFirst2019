@@ -83,6 +83,10 @@ Basic, Ruby, Swift.
             mapOf<String, Int>(),
             countSubstrings("input/align_in1.txt", listOf())
         )
+        assertEquals(
+            mapOf("ба" to 2),
+            countSubstrings("input/substrings_in3.txt", listOf("ба", "ба"))
+        )
     }
 
     @Test
@@ -132,6 +136,10 @@ Basic, Ruby, Swift.
 
         centerFile("input/empty.txt", "temp.txt")
         assertFileContent("temp.txt", "")
+        File("temp.txt").delete()
+
+        centerFile("input/center_in2.txt", "temp.txt")
+        assertFileContent("temp.txt", "АХ")
         File("temp.txt").delete()
     }
 
@@ -250,16 +258,12 @@ TEW                                      DEW"""
         assertFileContent("temp.txt", "")
         File("temp.txt").delete()
 
-        transliterate(
-            "input/trans_in1.txt",
-            mapOf(),
-            "temp.txt"
-        )
-        assertFileContent(
-            "temp.txt",
-            "Здравствуй,\n" +
-                    "мир!"
-        )
+        transliterate("input/trans_in1.txt", mapOf(), "temp.txt")
+        assertFileContent("temp.txt", "Здравствуй,\n" + "мир!")
+        File("temp.txt").delete()
+
+        transliterate("input/trans_in2.txt", mapOf('a' to ""), "temp.txt")
+        assertFileContent("temp.txt", "")
         File("temp.txt").delete()
     }
 
@@ -485,6 +489,30 @@ TEW                                      DEW"""
                ----
                   3
              """
+        )
+        test(
+            705324,
+            1,
+            """
+ 705324 | 1
+-7        705324
+--
+ 00
+ -0
+ --
+  05
+  -5
+  --
+   03
+   -3
+   --
+    02
+    -2
+    --
+     04
+     -4
+     --
+      0"""
         )
 
         fun pdp(num1: Int, num2: Int) {

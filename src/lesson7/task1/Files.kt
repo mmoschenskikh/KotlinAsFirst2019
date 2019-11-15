@@ -55,10 +55,10 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  *
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
-    val output = substrings.map { it to 0 }.toMap().toMutableMap()
+    val output = substrings.toSet().map { it to 0 }.toMap().toMutableMap()
     File(inputName).readLines().forEach { line ->
         val string = line.toLowerCase()
-        substrings.forEach { substring ->
+        substrings.toSet().forEach { substring ->
             for (i in string.indices) {
                 if (
                     substring.length + i <= string.length &&
@@ -122,7 +122,7 @@ fun sibilants(inputName: String, outputName: String) =
  */
 fun centerFile(inputName: String, outputName: String) {
     val inputStream = File(inputName).readLines()
-    val maxLength = inputStream.maxBy { it.length }?.length ?: 0
+    val maxLength = inputStream.maxBy { it.trim().length }?.trim()?.length ?: 0
     File(outputName).bufferedWriter().use {
         inputStream.forEach { line ->
             val string = line.trim()
@@ -274,10 +274,14 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
                     Regex(searchFor, RegexOption.IGNORE_CASE).replace(line) { found ->
                         val match = found.value.first() // Всегда находится ровно один символ
                         with(dict.getValue(match.toLowerCase())) {
-                            (if (match.isUpperCase())
-                                this.first().toUpperCase()
-                            else
-                                this.first()) + this.substring(1)
+                            if (this.isNotEmpty()) {
+                                (if (match.isUpperCase())
+                                    this.first().toUpperCase()
+                                else
+                                    this.first()) + this.substring(1)
+                            } else {
+                                ""
+                            }
                         }
                     }
                 )
@@ -597,7 +601,6 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             subtrahend = minuend - minuend % rhv
             strSubtrahend = "-$subtrahend"
             remainder = minuend - subtrahend
-            if (minuend == 0) break
             digitsTaken++
             it.write(String.format("%${shift}s\n", strMinuend))
             it.write(String.format("%${shift}s\n", strSubtrahend))
