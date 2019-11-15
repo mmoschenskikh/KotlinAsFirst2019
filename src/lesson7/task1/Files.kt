@@ -268,7 +268,9 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
     if (dictionary.isNotEmpty()) {
         val dict = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }.toMap()
         val searchFor =
-            dictionary.keys.joinToString(separator = """|""") { if (it !in 'a'..'z' && it !in 'A'..'Z') """\""" + it else it.toString() }
+            dictionary.keys.joinToString(separator = """|""") {
+                if (it !in ('a'..'z') + ('A'..'Z') + ('0'..'9')) """\""" + it else it.toString()
+            }
         File(outputName).bufferedWriter().use {
             File(inputName).readLines().forEach { line ->
                 it.write(
@@ -590,16 +592,16 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         var strSubtrahend = "-$subtrahend"
         var remainder = minuend - subtrahend
         var gap = 2 + width - digitNumber(subtrahend)
-        if (digitsTaken == digits.size && strMinuend.length == strSubtrahend.length) {
-            val shift = strMinuend.length - strSubtrahend.length
+        if ((digitsTaken == digits.size|| minuend < rhv) && strMinuend.length >= strSubtrahend.length ) {
+            val shift = if (digitsTaken >= strSubtrahend.length) digitsTaken - strSubtrahend.length else 0
             width -= 1
             it.write(String.format("%${width}d | %d\n", lhv, rhv))
             it.write(' ' * shift + strSubtrahend + ' ' * 3 + "$result\n")
-            it.write(' ' * shift + '-' * (strSubtrahend.length) + '\n')
+            it.write(String.format("%${width}s", '-' * (maxOf(strSubtrahend.length, digitNumber(remainder))) + '\n'))
         } else {
             it.write(String.format("%${width}d | %d\n", lhv, rhv))
             it.write(strSubtrahend + ' ' * gap + "$result\n")
-            it.write('-' * (strSubtrahend.length) + '\n')
+            it.write('-' * (maxOf(strSubtrahend.length, digitNumber(remainder))) + '\n')
         }
         while (digitsTaken < digits.size) {
             if (remainder < rhv) {

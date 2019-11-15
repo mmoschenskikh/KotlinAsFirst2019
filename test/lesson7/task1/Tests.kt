@@ -269,6 +269,10 @@ TEW                                      DEW"""
         transliterate("input/trans_in2.txt", mapOf('?' to "a"), "temp.txt")
         assertFileContent("temp.txt", "a")
         File("temp.txt").delete()
+
+        transliterate("input/trans_in2.txt", mapOf('0' to "a"), "temp.txt")
+        assertFileContent("temp.txt", "a")
+        File("temp.txt").delete()
     }
 
     @Test
@@ -526,6 +530,15 @@ TEW                                      DEW"""
   ------
    65102"""
         )
+        test(
+            3081,
+            3638,
+            """
+               3081 | 3638
+                 -0   0
+               ----
+               3081"""
+        )
 
         fun pdp(num1: Int, num2: Int) {
             printDivisionProcess(num1, num2, "temp.txt")
@@ -540,6 +553,7 @@ TEW                                      DEW"""
         pdp(6344, 61)
         pdp(0, 239)
         pdp(143078, 77976)
+        pdp(3081, 3638)
         assertThrows(ArithmeticException::class.java) { printDivisionProcess(13280, 0, "temp.txt") }
 
         File("temp.txt").delete()
