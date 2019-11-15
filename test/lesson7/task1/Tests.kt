@@ -1,9 +1,12 @@
 package lesson7.task1
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.io.File
+import java.lang.ArithmeticException
 
 class Tests {
 
@@ -417,23 +420,6 @@ Basic, Ruby, Swift.
         }
 
         test(
-            19935,
-            22,
-            """
-              19935 | 22
-             -198     906
-             ----
-                13
-                -0
-                --
-                135
-               -132
-               ----
-                  3
-             """
-        )
-
-        test(
             2,
             20,
             """
@@ -466,6 +452,37 @@ Basic, Ruby, Swift.
                   0
              """
         )
+
+        test(
+            19935,
+            22,
+            """
+              19935 | 22
+             -198     906
+             ----
+                13
+                -0
+                --
+                135
+               -132
+               ----
+                  3
+             """
+        )
+
+        fun pdp(num1: Int, num2: Int) {
+            printDivisionProcess(num1, num2, "temp.txt")
+            println(File("temp.txt").readText())
+            File("temp.txt").delete()
+        }
+        pdp(5538, 26)
+        pdp(17714, 34)
+        pdp(2415, 23)
+        pdp(1750, 25)
+        pdp(558, 18)
+        pdp(6344, 61)
+        pdp(0, 239)
+        assertThrows(ArithmeticException::class.java) { printDivisionProcess(13280, 0, "temp.txt") }
 
         File("temp.txt").delete()
     }

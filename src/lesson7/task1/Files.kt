@@ -533,7 +533,7 @@ operator fun Int.times(charSequence: CharSequence): String =
  *
  * Пример (для lhv == 19935, rhv == 22):
 19935 | 22
--198     906
+-198    906
 ----
 13
 -0
@@ -547,5 +547,45 @@ operator fun Int.times(charSequence: CharSequence): String =
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    val result = lhv / rhv
+    val width = digitNumber(lhv) + 1
+    val digits = lhv.toString().toList().map { it.toString() }
+    File(outputName).bufferedWriter().use {
+        it.write(String.format("%${width}d | %d", lhv, rhv))
+        it.newLine()
+        var minuend = 0
+        var strMinuend = minuend.toString()
+        var i = 0
+        while (minuend < rhv && i < digits.size) {
+            minuend = digits.subList(0, i + 1).joinToString(separator = "").toInt()
+            i++
+        }
+        var subtrahend = minuend / rhv * rhv
+        var strSubtrahend = "-$subtrahend"
+        var remainder = minuend - subtrahend
+        var shift = width - digitNumber(subtrahend) + 2
+        it.write(strSubtrahend + ' ' * shift + "$result")
+        it.newLine()
+        it.write('-' * (digitNumber(subtrahend) + 1))
+        it.newLine()
+        while (i < digits.size) {
+            if (remainder < rhv) {
+                strMinuend = remainder.toString() + digits[i]
+                minuend = strMinuend.toInt()
+            }
+            shift = i + 2
+            subtrahend = minuend / rhv * rhv
+            strSubtrahend = "-$subtrahend"
+            remainder = minuend - subtrahend
+            i++
+            if (minuend == 0) break
+            it.write(String.format("%${shift}s", strMinuend))
+            it.newLine()
+            it.write(String.format("%${shift}s", strSubtrahend))
+            it.newLine()
+            it.write(String.format("%${shift}s", '-' * maxOf(digitNumber(minuend), digitNumber(subtrahend) + 1)))
+            it.newLine()
+        }
+        it.write(String.format("%${width}d", remainder))
+    }
 }
