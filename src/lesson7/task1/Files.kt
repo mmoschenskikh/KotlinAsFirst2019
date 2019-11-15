@@ -161,7 +161,36 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val inputStream = File(inputName).readLines()
+    val maxLength =
+        inputStream.map { Regex(""" +""").split(it.trim()).joinToString(separator = " ") }
+            .maxBy { it.length }?.length ?: 0
+    File(outputName).bufferedWriter().use {
+        inputStream.forEach { line ->
+            val words = Regex(""" +""").split(line.trim())
+            when {
+                line.isEmpty() -> it.newLine()
+                words.size == 1 -> {
+                    it.write(words[0])
+                    it.newLine()
+                }
+                else -> {
+                    val wordsLength = words.fold(0) { prev, current -> prev + current.length }
+                    val gapsLength = maxLength - wordsLength
+                    val gapsCount = words.size - 1
+                    val gapSize = (gapsLength) / gapsCount
+                    val biggerGapsCount = gapsLength - gapSize * gapsCount
+                    val gaps =
+                        List(biggerGapsCount) { ' ' * (gapSize + 1) } + List(gapsCount - biggerGapsCount) { ' ' * gapSize }
+                    for (i in gaps.indices) {
+                        it.write(words[i] + gaps[i])
+                    }
+                    it.write(words.last())
+                    it.newLine()
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -494,22 +523,16 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
     val width = digitNumber(result) + 1
     val digits = rhv.toString().toList().map { it.toString().toInt() }.reversed()
     File(outputName).bufferedWriter().use {
-        it.write(String.format("%${width}d", lhv))
-        it.newLine()
-        it.write(String.format("*%${width - 1}d", rhv))
-        it.newLine()
-        it.write('-' * width)
-        it.newLine()
-        it.write(String.format("%${width}d", lhv * digits[0]))
+        it.write(String.format("%${width}d\n", lhv))
+        it.write(String.format("*%${width - 1}d\n", rhv))
+        it.write('-' * width + '\n')
+        it.write(String.format("%${width}d\n", lhv * digits[0]))
         var i = width - 2
         for (digit in digits.subList(1, digits.size)) {
-            it.newLine()
-            it.write(String.format("+%${i}d", lhv * digit))
+            it.write(String.format("+%${i}d\n", lhv * digit))
             i--
         }
-        it.newLine()
-        it.write('-' * width)
-        it.newLine()
+        it.write('-' * width + '\n')
         it.write(String.format("%${width}d", result))
     }
 }
@@ -551,40 +574,34 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val width = digitNumber(lhv) + 1
     val digits = lhv.toString().toList().map { it.toString() }
     File(outputName).bufferedWriter().use {
-        it.write(String.format("%${width}d | %d", lhv, rhv))
-        it.newLine()
         var minuend = 0
-        var strMinuend = minuend.toString()
-        var i = 0
-        while (minuend < rhv && i < digits.size) {
-            minuend = digits.subList(0, i + 1).joinToString(separator = "").toInt()
-            i++
+        var strMinuend = "$minuend"
+        var digitsTaken = 0
+        while (minuend < rhv && digitsTaken < digits.size) {
+            minuend = digits.subList(0, digitsTaken + 1).joinToString(separator = "").toInt()
+            digitsTaken++
         }
-        var subtrahend = minuend / rhv * rhv
+        var subtrahend = minuend - minuend % rhv
         var strSubtrahend = "-$subtrahend"
         var remainder = minuend - subtrahend
-        var shift = width - digitNumber(subtrahend) + 2
-        it.write(strSubtrahend + ' ' * shift + "$result")
-        it.newLine()
-        it.write('-' * (digitNumber(subtrahend) + 1))
-        it.newLine()
-        while (i < digits.size) {
+        var shift = 2 + width - digitNumber(subtrahend)
+        it.write(String.format("%${width}d | %d\n", lhv, rhv))
+        it.write(strSubtrahend + ' ' * shift + "$result\n")
+        it.write('-' * (digitNumber(subtrahend) + 1) + '\n')
+        while (digitsTaken < digits.size) {
             if (remainder < rhv) {
-                strMinuend = remainder.toString() + digits[i]
+                strMinuend = remainder.toString() + digits[digitsTaken]
                 minuend = strMinuend.toInt()
             }
-            shift = i + 2
-            subtrahend = minuend / rhv * rhv
+            shift = 2 + digitsTaken
+            subtrahend = minuend - minuend % rhv
             strSubtrahend = "-$subtrahend"
             remainder = minuend - subtrahend
-            i++
             if (minuend == 0) break
-            it.write(String.format("%${shift}s", strMinuend))
-            it.newLine()
-            it.write(String.format("%${shift}s", strSubtrahend))
-            it.newLine()
-            it.write(String.format("%${shift}s", '-' * maxOf(digitNumber(minuend), digitNumber(subtrahend) + 1)))
-            it.newLine()
+            digitsTaken++
+            it.write(String.format("%${shift}s\n", strMinuend))
+            it.write(String.format("%${shift}s\n", strSubtrahend))
+            it.write(String.format("%${shift}s\n", '-' * maxOf(strMinuend.length, strSubtrahend.length)))
         }
         it.write(String.format("%${width}d", remainder))
     }

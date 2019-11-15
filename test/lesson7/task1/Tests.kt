@@ -162,6 +162,23 @@ Basic, Ruby, Swift.
         )
         File("temp.txt").delete()
 
+        alignFileByWidth("input/empty.txt", "temp.txt")
+        assertFileContent("temp.txt", "")
+        File("temp.txt").delete()
+
+        alignFileByWidth("input/width_in2.txt", "temp.txt")
+        assertFileContent(
+            "temp.txt",
+            """Чылынымыс
+Найти                                майонез
+Котлин -- самый лучший язык программирования
+
+лол
+Вайк                                Мазовски
+Проверьте          сабмит         пожалуйста
+TEW                                      DEW"""
+        )
+        File("temp.txt").delete()
     }
 
     @Test
