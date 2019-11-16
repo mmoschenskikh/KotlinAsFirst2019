@@ -379,7 +379,83 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    val source = File(inputName).readLines()
+    val tagState = mutableMapOf("*" to false, "**" to false, "~~" to false)
+    val tagPlace = mutableMapOf("*" to -1, "**" to -1)
+    File(outputName).bufferedWriter().use {
+        it.write("<html>\n<body>\n<p>\n")
+        source.forEach { line ->
+            if (line.isEmpty()) {
+                it.write("\n</p>\n<p>\n")
+            } else {
+                val parts = Regex("""\*{1,3}|~~""").split(line)
+                val tags = Regex("""\*{1,3}|~~""").findAll(line).map { matchResult ->
+                    when (matchResult.value) {
+                        "*" -> if (tagState["*"] == false) {
+                            tagState["*"] = true
+                            tagPlace["*"] = matchResult.range.first
+                            "<i>"
+                        } else {
+                            tagState["*"] = false
+                            tagPlace["*"] = -1
+                            "</i>"
+                        }
+                        "**" -> if (tagState["**"] == false) {
+                            tagState["**"] = true
+                            tagPlace["**"] = matchResult.range.first
+                            "<b>"
+                        } else {
+                            tagState["**"] = false
+                            tagPlace["**"] = -1
+                            "</b>"
+                        }
+                        "~~" -> if (tagState["~~"] == false) {
+                            tagState["~~"] = true
+                            "<s>"
+                        } else {
+                            tagState["~~"] = false
+                            "</s>"
+                        }
+                        else -> if (tagState["*"] == false) {
+                            if (tagState["**"] == false) {
+                                tagState["*"] = true
+                                tagState["**"] = true
+                                "<b><i>"
+                            } else {
+                                tagState["*"] = true
+                                tagState["**"] = false
+                                "</b><i>"
+                            }
+                        } else {
+                            if (tagState["**"] == false) {
+                                tagState["*"] = false
+                                tagState["**"] = true
+                                "</i><b>"
+                            } else {
+                                tagState["*"] = false
+                                tagState["**"] = false
+                                if (tagPlace["*"]!! > tagPlace["**"]!!) "</i></b>" else "</b></i>"
+                            }
+                        }
+                    }
+                }.toList()
+                for (i in tags.indices) {
+                    it.write(parts[i])
+                    it.write(tags[i])
+                }
+                it.write(parts.last())
+            }
+        }
+        it.write("\n</p>\n</body>\n</html>")
+    }
+}
+
+fun Boolean.invert() = !this
+
+fun main() {
+    markdownToHtmlSimple("input/width_in1.txt", "temp.txt")
+    println(File("temp.txt").readText())
+    File("temp.txt").delete()
 }
 
 /**
