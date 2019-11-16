@@ -380,59 +380,61 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val source = File(inputName).readLines()
-    val tagState = mutableMapOf("*" to true, "**" to true, "~~" to true)
-    val tagPlace = mutableMapOf("*" to -1, "**" to -1)
+    val tagState = mutableMapOf("i" to true, "b" to true, "s" to true, "p" to false)
+    val tagPlace = mutableMapOf("i" to -1, "b" to -1)
     File(outputName).bufferedWriter().use {
         it.write("<html>\n<body>\n<p>\n")
         source.forEach { line ->
             if (line.isEmpty()) {
-                it.write("\n</p>\n<p>\n")
+                if (tagState["p"] == false) it.write("\n</p>\n<p>\n")
+                tagState["p"] = true
             } else {
+                tagState["p"] = false
                 val parts = Regex("""\*{1,3}|~~""").split(line)
                 val tags = Regex("""\*{1,3}|~~""").findAll(line).map { matchResult ->
                     when (matchResult.value) {
                         "*" -> {
-                            tagState["*"] = !tagState["*"]!!
-                            if (tagState["*"] == false) {
-                                tagPlace["*"] = matchResult.range.first
+                            tagState["i"] = !tagState["i"]!!
+                            if (tagState["i"] == false) {
+                                tagPlace["i"] = matchResult.range.first
                                 "<i>"
                             } else {
-                                tagPlace["*"] = -1
+                                tagPlace["i"] = -1
                                 "</i>"
                             }
                         }
                         "**" -> {
-                            tagState["**"] = !tagState["**"]!!
-                            if (tagState["**"] == false) {
-                                tagPlace["**"] = matchResult.range.first
+                            tagState["b"] = !tagState["b"]!!
+                            if (tagState["b"] == false) {
+                                tagPlace["b"] = matchResult.range.first
                                 "<b>"
                             } else {
-                                tagPlace["**"] = -1
+                                tagPlace["b"] = -1
                                 "</b>"
                             }
                         }
                         "~~" -> {
-                            tagState["~~"] = !tagState["~~"]!!
-                            if (tagState["~~"] == false) {
+                            tagState["s"] = !tagState["s"]!!
+                            if (tagState["s"] == false) {
                                 "<s>"
                             } else {
                                 "</s>"
                             }
                         }
                         else -> {
-                            tagState["*"] = !tagState["*"]!!
-                            tagState["**"] = !tagState["**"]!!
-                            if (tagState["*"] == false) {
-                                if (tagState["**"] == false) {
+                            tagState["i"] = !tagState["i"]!!
+                            tagState["b"] = !tagState["b"]!!
+                            if (tagState["i"] == false) {
+                                if (tagState["b"] == false) {
                                     "<b><i>"
                                 } else {
                                     "</b><i>"
                                 }
                             } else {
-                                if (tagState["**"] == false) {
+                                if (tagState["b"] == false) {
                                     "</i><b>"
                                 } else {
-                                    if (tagPlace["*"]!! > tagPlace["**"]!!) "</i></b>" else "</b></i>"
+                                    if (tagPlace["i"]!! > tagPlace["b"]!!) "</i></b>" else "</b></i>"
                                 }
                             }
                         }
@@ -449,7 +451,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 }
 
 fun main() {
-    markdownToHtmlSimple("input/width_in1.txt", "temp.txt")
+    markdownToHtmlSimple("input/markdown_simple — копия.md", "temp.txt")
     println(File("temp.txt").readText())
     File("temp.txt").delete()
 }
