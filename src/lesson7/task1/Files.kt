@@ -390,52 +390,37 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 tagState["p"] = true
             } else {
                 tagState["p"] = false
+                var tag = ""
                 val parts = Regex("""\*{1,3}|~~""").split(line)
                 val tags = Regex("""\*{1,3}|~~""").findAll(line).map { matchResult ->
-                    when (matchResult.value) {
-                        "*" -> {
-                            tagState["i"] = !tagState["i"]!!
-                            if (tagState["i"] == false) {
-                                tagPlace["i"] = matchResult.range.first
-                                "<i>"
-                            } else {
-                                tagPlace["i"] = -1
-                                "</i>"
-                            }
+                    if (matchResult.value != "***") {
+                        when (matchResult.value) {
+                            "*" -> tag = "i"
+                            "**" -> tag = "b"
+                            "~~" -> tag = "s"
                         }
-                        "**" -> {
-                            tagState["b"] = !tagState["b"]!!
+                        tagState[tag] = !tagState[tag]!!
+                        if (tagState[tag] == false) {
+                            tagPlace[tag] = matchResult.range.first
+                            "<$tag>"
+                        } else {
+                            tagPlace[tag] = -1
+                            "</$tag>"
+                        }
+                    } else {
+                        tagState["i"] = !tagState["i"]!!
+                        tagState["b"] = !tagState["b"]!!
+                        if (tagState["i"] == false) {
                             if (tagState["b"] == false) {
-                                tagPlace["b"] = matchResult.range.first
-                                "<b>"
+                                "<b><i>"
                             } else {
-                                tagPlace["b"] = -1
-                                "</b>"
+                                "</b><i>"
                             }
-                        }
-                        "~~" -> {
-                            tagState["s"] = !tagState["s"]!!
-                            if (tagState["s"] == false) {
-                                "<s>"
+                        } else {
+                            if (tagState["b"] == false) {
+                                "</i><b>"
                             } else {
-                                "</s>"
-                            }
-                        }
-                        else -> {
-                            tagState["i"] = !tagState["i"]!!
-                            tagState["b"] = !tagState["b"]!!
-                            if (tagState["i"] == false) {
-                                if (tagState["b"] == false) {
-                                    "<b><i>"
-                                } else {
-                                    "</b><i>"
-                                }
-                            } else {
-                                if (tagState["b"] == false) {
-                                    "</i><b>"
-                                } else {
-                                    if (tagPlace["i"]!! > tagPlace["b"]!!) "</i></b>" else "</b></i>"
-                                }
+                                if (tagPlace["i"]!! > tagPlace["b"]!!) "</i></b>" else "</b></i>"
                             }
                         }
                     }
