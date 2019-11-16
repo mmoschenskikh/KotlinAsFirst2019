@@ -384,12 +384,12 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val tagState = mutableMapOf("i" to true, "b" to true, "s" to true, "p" to true)
     val tagPlace = mutableMapOf("i" to -1, "b" to -1)
     File(outputName).bufferedWriter().use {
-        it.write("<html>\n<body>\n<p>\n")
+        it.write("<html><body><p>")
         File(inputName).readLines()
             .dropLastWhile { line -> line.isEmpty() }
             .forEach { line ->
                 if (line.isEmpty()) {
-                    if (tagState["p"] == false) it.write("</p>\n<p>\n")
+                    if (tagState["p"] == false) it.write("</p><p>")
                     tagState["p"] = true
                 } else {
                     tagState["p"] = false
@@ -432,10 +432,9 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         it.write(parts[i] + tags[i])
                     }
                     it.write(parts.last())
-                    it.newLine()
                 }
             }
-        it.write("</p>\n</body>\n</html>")
+        it.write("</p></body></html>")
     }
 }
 
@@ -483,7 +482,7 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
     val deque = mutableListOf<String>()
     var nestedListLevel = -1
     File(outputName).bufferedWriter().use {
-        it.write("<html>\n<body>\n")
+        it.write("<html><body>")
         File(inputName).readLines().forEach { line ->
             if (line.isEmpty()) {
                 it.newLine()
@@ -528,9 +527,9 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
             }
         }
         while (deque.isNotEmpty()) {
-            it.write("\n</${deque.pop()}>")
+            it.write("</${deque.pop()}>")
         }
-        it.write("\n</body>\n</html>")
+        it.write("</body></html>")
     }
 }
 
@@ -554,11 +553,25 @@ fun <T> MutableList<T>.peek(index: Int = 0) = this[index]
  */
 fun markdownToHtml(inputName: String, outputName: String) {
     markdownToHtmlLists(inputName, "temp.txt")
-    val text = File("temp.txt").readText()
+    var text = File("temp.txt").readText()
     File("temp.txt").delete()
-    File("temp.txt").bufferedWriter().use { it.write(Regex("""</?body>|</?html>""").replace(text, "")) }
-    markdownToHtmlSimple("temp.txt", outputName)
+    File(outputName).bufferedWriter().use {
+        it.write(Regex("""</?body>|</?html>""").replace(text, ""))
+    }
+    markdownToHtmlSimple(outputName, "temp.txt")
+    text = File("temp.txt").readText()
     File("temp.txt").delete()
+    File(outputName).bufferedWriter().use {
+        it.write(
+            Regex("""<p><[ou]l>|</[ou]l></p>""").replace(text) { match ->
+                when (match.value) {
+                    "<p><ol>" -> "<ol>"
+                    "<p><ul>" -> "<ul>"
+                    "</ol></p>" -> "</ol>"
+                    else -> "</ul>"
+                }
+            })
+    }
 }
 
 /**
