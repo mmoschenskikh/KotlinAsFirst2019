@@ -379,58 +379,58 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    val source = File(inputName).readLines()
     val tagState = mutableMapOf("i" to true, "b" to true, "s" to true, "p" to true)
     val tagPlace = mutableMapOf("i" to -1, "b" to -1)
     File(outputName).bufferedWriter().use {
         it.write("<html>\n<body>\n<p>\n")
-        source.forEach { line ->
-            if (line.isEmpty()) {
-                if (tagState["p"] == false) it.write("\n</p>\n<p>\n")
-                tagState["p"] = true
-            } else {
-                tagState["p"] = false
-                var tag = ""
-                val parts = Regex("""\*{1,3}|~~""").split(line)
-                val tags = Regex("""\*{1,3}|~~""").findAll(line).map { matchResult ->
-                    if (matchResult.value != "***") {
-                        when (matchResult.value) {
-                            "*" -> tag = "i"
-                            "**" -> tag = "b"
-                            "~~" -> tag = "s"
-                        }
-                        tagState[tag] = !tagState[tag]!!
-                        if (tagState[tag] == false) {
-                            tagPlace[tag] = matchResult.range.first
-                            "<$tag>"
-                        } else {
-                            tagPlace[tag] = -1
-                            "</$tag>"
-                        }
-                    } else {
-                        tagState["i"] = !tagState["i"]!!
-                        tagState["b"] = !tagState["b"]!!
-                        if (tagState["i"] == false) {
-                            if (tagState["b"] == false) {
-                                "<b><i>"
+        File(inputName).readLines()
+            .dropLastWhile { line -> line.isEmpty() }
+            .forEach { line ->
+                if (line.isEmpty()) {
+                    if (tagState["p"] == false) it.write("\n</p>\n<p>\n")
+                    tagState["p"] = true
+                } else {
+                    tagState["p"] = false
+                    val parts = Regex("""\*{1,3}|~~""").split(line)
+                    val tags = Regex("""\*{1,3}|~~""").findAll(line).map { matchResult ->
+                        if (matchResult.value != "***") {
+                            val tag = when (matchResult.value) {
+                                "*" -> "i"
+                                "**" -> "b"
+                                else -> "s"
+                            }
+                            tagState[tag] = !tagState[tag]!!
+                            if (tagState[tag] == false) {
+                                tagPlace[tag] = matchResult.range.first
+                                "<$tag>"
                             } else {
-                                "</b><i>"
+                                tagPlace[tag] = -1
+                                "</$tag>"
                             }
                         } else {
-                            if (tagState["b"] == false) {
-                                "</i><b>"
+                            tagState["i"] = !tagState["i"]!!
+                            tagState["b"] = !tagState["b"]!!
+                            if (tagState["i"] == false) {
+                                if (tagState["b"] == false) {
+                                    "<b><i>"
+                                } else {
+                                    "</b><i>"
+                                }
                             } else {
-                                if (tagPlace["i"]!! > tagPlace["b"]!!) "</i></b>" else "</b></i>"
+                                if (tagState["b"] == false) {
+                                    "</i><b>"
+                                } else {
+                                    if (tagPlace["i"]!! > tagPlace["b"]!!) "</i></b>" else "</b></i>"
+                                }
                             }
                         }
+                    }.toList()
+                    for (i in tags.indices) {
+                        it.write(parts[i] + tags[i])
                     }
-                }.toList()
-                for (i in tags.indices) {
-                    it.write(parts[i] + tags[i])
+                    it.write(parts.last())
                 }
-                it.write(parts.last())
             }
-        }
         it.write("\n</p>\n</body>\n</html>")
     }
 }
@@ -475,21 +475,21 @@ fun main() {
  *
  * Пример входного файла:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
-* Утка по-пекински
-    * Утка
-    * Соус
-* Салат Оливье
-    1. Мясо
-        * Или колбаса
-    2. Майонез
-    3. Картофель
-    4. Что-то там ещё
-* Помидоры
-* Фрукты
-    1. Бананы
-    23. Яблоки
-        1. Красные
-        2. Зелёные
+ * Утка по-пекински
+ * Утка
+ * Соус
+ * Салат Оливье
+1. Мясо
+ * Или колбаса
+2. Майонез
+3. Картофель
+4. Что-то там ещё
+ * Помидоры
+ * Фрукты
+1. Бананы
+23. Яблоки
+1. Красные
+2. Зелёные
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  *
  *
