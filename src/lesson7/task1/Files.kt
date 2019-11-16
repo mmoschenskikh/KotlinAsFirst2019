@@ -380,7 +380,7 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val source = File(inputName).readLines()
-    val tagState = mutableMapOf("i" to true, "b" to true, "s" to true, "p" to false)
+    val tagState = mutableMapOf("i" to true, "b" to true, "s" to true, "p" to true)
     val tagPlace = mutableMapOf("i" to -1, "b" to -1)
     File(outputName).bufferedWriter().use {
         it.write("<html>\n<body>\n<p>\n")
@@ -475,21 +475,21 @@ fun main() {
  *
  * Пример входного файла:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
- * Утка по-пекински
- * Утка
- * Соус
- * Салат Оливье
-1. Мясо
- * Или колбаса
-2. Майонез
-3. Картофель
-4. Что-то там ещё
- * Помидоры
- * Фрукты
-1. Бананы
-23. Яблоки
-1. Красные
-2. Зелёные
+* Утка по-пекински
+    * Утка
+    * Соус
+* Салат Оливье
+    1. Мясо
+        * Или колбаса
+    2. Майонез
+    3. Картофель
+    4. Что-то там ещё
+* Помидоры
+* Фрукты
+    1. Бананы
+    23. Яблоки
+        1. Красные
+        2. Зелёные
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  *
  *
