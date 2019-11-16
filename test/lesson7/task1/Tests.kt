@@ -372,11 +372,77 @@ TEW                                      DEW"""
         File("temp.html").delete()
     }
 
+    private fun checkHtmlListsExample2() {
+        val result = File("temp.html").readText().replace(Regex("[\\s\\n\\t]"), "")
+        val expected =
+            """<html>
+<body>
+    <ol>
+        <li>Chapter One
+            <ol>
+                <li>Section One</li>
+                <li>Section Two </li>
+                <li>Section Three
+                    <ul>
+                        <li>
+                            Утка по-пекински
+                            <ul>
+                                <li>Утка</li>
+                                <li>Соус</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Салат Оливье
+                            <ol>
+                                <li>Мясо
+                                    <ul>
+                                        <li>
+                                            Или колбаса
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>Майонез</li>
+                                <li>Картофель</li>
+                                <li>Что-то там ещё</li>
+                            </ol>
+                        </li>
+                        <li>Помидоры</li>
+                        <li>
+                            Фрукты
+                            <ol>
+                                <li>Бананы</li>
+                                <li>
+                                    Яблоки
+                                    <ol>
+                                        <li>Красные</li>
+                                        <li>Зелёные</li>
+                                    </ol>
+                                </li>
+                            </ol>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+        </li>
+        <li>Chapter Two</li>
+        <li>Chapter Three </li>
+    </ol>
+</body>
+</html>""".trimIndent().replace(Regex("[\\s\\n\\t]"), "")
+        assertEquals(expected, result)
+
+        File("temp.html").delete()
+    }
+
     @Test
     @Tag("Hard")
     fun markdownToHtmlLists() {
         markdownToHtmlLists("input/markdown_lists.md", "temp.html")
         checkHtmlListsExample()
+
+        markdownToHtmlLists("input/markdown_lists2.md", "temp.html")
+        println(File("temp.html").readText())
+        checkHtmlListsExample2()
     }
 
     @Test
@@ -558,6 +624,7 @@ TEW                                      DEW"""
         pdp(0, 239)
         pdp(143078, 77976)
         pdp(3081, 3638)
+        pdp(101877, 5123)
         assertThrows(ArithmeticException::class.java) { printDivisionProcess(13280, 0, "temp.txt") }
 
         File("temp.txt").delete()

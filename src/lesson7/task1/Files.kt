@@ -4,6 +4,8 @@ package lesson7.task1
 
 import lesson3.task1.digitNumber
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Пример
@@ -387,10 +389,11 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             .dropLastWhile { line -> line.isEmpty() }
             .forEach { line ->
                 if (line.isEmpty()) {
-                    if (tagState["p"] == false) it.write("\n</p>\n<p>\n")
+                    if (tagState["p"] == false) it.write("</p>\n<p>\n")
                     tagState["p"] = true
                 } else {
                     tagState["p"] = false
+                    tagPlace.keys.forEach { key -> tagPlace[key] = -1 }
                     val parts = Regex("""\*{1,3}|~~""").split(line)
                     val tags = Regex("""\*{1,3}|~~""").findAll(line).map { matchResult ->
                         if (matchResult.value != "***") {
@@ -429,9 +432,10 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         it.write(parts[i] + tags[i])
                     }
                     it.write(parts.last())
+                    it.newLine()
                 }
             }
-        it.write("\n</p>\n</body>\n</html>")
+        it.write("</p>\n</body>\n</html>")
     }
 }
 
@@ -473,76 +477,72 @@ fun main() {
  *
  * Все остальные части исходного текста должны остаться неизменными с точностью до наборов пробелов и переносов строк.
  *
- * Пример входного файла:
-///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
- * Утка по-пекински
- * Утка
- * Соус
- * Салат Оливье
-1. Мясо
- * Или колбаса
-2. Майонез
-3. Картофель
-4. Что-то там ещё
- * Помидоры
- * Фрукты
-1. Бананы
-23. Яблоки
-1. Красные
-2. Зелёные
-///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
- *
- *
- * Соответствующий выходной файл:
-///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
-<html>
-<body>
-<ul>
-<li>
-Утка по-пекински
-<ul>
-<li>Утка</li>
-<li>Соус</li>
-</ul>
-</li>
-<li>
-Салат Оливье
-<ol>
-<li>Мясо
-<ul>
-<li>
-Или колбаса
-</li>
-</ul>
-</li>
-<li>Майонез</li>
-<li>Картофель</li>
-<li>Что-то там ещё</li>
-</ol>
-</li>
-<li>Помидоры</li>
-<li>
-Фрукты
-<ol>
-<li>Бананы</li>
-<li>
-Яблоки
-<ol>
-<li>Красные</li>
-<li>Зелёные</li>
-</ol>
-</li>
-</ol>
-</li>
-</ul>
-</body>
-</html>
-///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    TODO()
+    val deque = mutableListOf<String>()
+    var nestedListLevel = -1
+    File(outputName).bufferedWriter().use {
+        it.write("<html>\n<body>\n")
+        File(inputName).readLines().forEach { line ->
+            if (line.isEmpty()) {
+                it.newLine()
+                it.newLine()
+                while (deque.isNotEmpty()) {
+                    it.write("</${deque.pop()}>")
+                }
+                nestedListLevel = -1
+            } else {
+                var printed = false
+                val searchRange = 0..(nestedListLevel + 1)
+                for (i in searchRange) {
+                    val searchFor = "^ {${4 * i}}(\\*|\\d+\\.).*"
+                    if (line.matches(Regex(searchFor))) {
+                        val type = when (Regex("""(\*|\d+\.)""").find(line)?.value) {
+                            "*" -> "ul"
+                            null -> ""
+                            else -> "ol"
+                        }
+                        printed = true
+                        if (type != "") {
+                            when {
+                                i > nestedListLevel -> {
+                                    deque.push(type)
+                                    deque.push("li")
+                                    it.write("<$type>" + Regex("""(\*|\d+\.)""").replace(line, "<li>"))
+                                }
+                                i == nestedListLevel ->
+                                    it.write("</li>" + Regex("""(\*|\d+\.)""").replace(line, "<li>"))
+                                else -> {
+                                    while (deque.size > 2 * (i + 1)) {
+                                        it.write("</${deque.pop()}>")
+                                    }
+                                    it.write("</li>" + Regex("""(\*|\d+\.)""").replace(line, "<li>"))
+                                }
+                            }
+                            nestedListLevel = i
+                        }
+                    }
+                }
+                if (!printed) it.write(line)
+            }
+        }
+        while (deque.isNotEmpty()) {
+            it.write("\n</${deque.pop()}>")
+        }
+        it.write("\n</body>\n</html>")
+    }
 }
+
+fun <T> MutableList<T>.pop(index: Int = 0): T {
+    val element = this[index]
+    this.removeAt(index)
+    return element
+}
+
+fun <T> MutableList<T>.push(element: T, index: Int = 0) = this.add(index, element)
+
+fun <T> MutableList<T>.peek(index: Int = 0) = this[index]
 
 /**
  * Очень сложная
@@ -553,7 +553,12 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
  *
  */
 fun markdownToHtml(inputName: String, outputName: String) {
-    TODO()
+    markdownToHtmlLists(inputName, "temp.txt")
+    val text = File("temp.txt").readText()
+    File("temp.txt").delete()
+    File("temp.txt").bufferedWriter().use { it.write(Regex("""</?body>|</?html>""").replace(text, "")) }
+    markdownToHtmlSimple("temp.txt", outputName)
+    File("temp.txt").delete()
 }
 
 /**
