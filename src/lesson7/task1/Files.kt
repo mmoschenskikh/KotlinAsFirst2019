@@ -494,6 +494,7 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
             } else {
                 var printed = false
                 val searchRange = 0..(nestedListLevel + 1)
+                var outputString = ""
                 for (i in searchRange) {
                     val searchFor = "^ {${4 * i}}(\\*|\\d+\\.).*"
                     if (line.matches(Regex(searchFor))) {
@@ -504,26 +505,27 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
                         }
                         printed = true
                         if (type != "") {
-                            when {
+                            outputString = when {
                                 i > nestedListLevel -> {
                                     deque.push(type)
                                     deque.push("li")
-                                    it.write("<$type>" + Regex("""(\*|\d+\.)""").replace(line, "<li>"))
+                                    "<$type>"
                                 }
                                 i == nestedListLevel ->
-                                    it.write("</li>" + Regex("""(\*|\d+\.)""").replace(line, "<li>"))
+                                    "</li>"
                                 else -> {
                                     while (deque.size > 2 * (i + 1)) {
                                         it.write("</${deque.pop()}>")
                                     }
-                                    it.write("</li>" + Regex("""(\*|\d+\.)""").replace(line, "<li>"))
+                                    "</li>"
                                 }
-                            }
+                            } + Regex("""(\*|\d+\.)""").replace(line, "<li>")
                             nestedListLevel = i
                         }
                     }
                 }
-                if (!printed) it.write(line)
+                if (!printed) outputString = line
+                it.write(outputString)
             }
         }
         while (deque.isNotEmpty()) {
@@ -541,7 +543,12 @@ fun <T> MutableList<T>.pop(index: Int = 0): T {
 
 fun <T> MutableList<T>.push(element: T, index: Int = 0) = this.add(index, element)
 
-fun <T> MutableList<T>.peek(index: Int = 0) = this[index]
+fun <T> MutableList<T>.peek(index: Int = 0) =
+    try {
+        this[index]
+    } catch (e: Exception) {
+        null
+    }
 
 /**
  * Очень сложная
@@ -552,27 +559,115 @@ fun <T> MutableList<T>.peek(index: Int = 0) = this[index]
  *
  */
 fun markdownToHtml(inputName: String, outputName: String) {
-    markdownToHtmlLists(inputName, "temp.txt")
-    var text = File("temp.txt").readText()
-    File("temp.txt").delete()
+    val tagState = mutableMapOf("i" to true, "b" to true, "s" to true)
+    val tagPlace = mutableMapOf("i" to -1, "b" to -1)
+    val deque = mutableListOf<String>()
+    var nestedListLevel = -1
     File(outputName).bufferedWriter().use {
-        it.write(Regex("""</?body>|</?html>""").replace(text, ""))
-    }
-    markdownToHtmlSimple(outputName, "temp.txt")
-    text = File("temp.txt").readText()
-    File("temp.txt").delete()
-    File(outputName).bufferedWriter().use {
-        it.write(
-            Regex("""<p><[ou]l>|</[ou]l></p>""").replace(text) { match ->
-                when (match.value) {
-                    "<p><ol>" -> "<ol>"
-                    "<p><ul>" -> "<ul>"
-                    "</ol></p>" -> "</ol>"
-                    else -> "</ul>"
+        it.write("<html><body>")
+        File(inputName).readLines()
+            .dropWhile { line -> line.isEmpty() }
+            .dropLastWhile { line -> line.isEmpty() }
+            .forEach { line ->
+                if (line.isEmpty()) {
+                    while (deque.isNotEmpty()) {
+                        it.write("</${deque.pop()}>")
+                    }
+                    nestedListLevel = -1
+                } else {
+                    var printed = false
+                    val searchRange = 0..(nestedListLevel + 1)
+                    var outputString = ""
+
+                    tagPlace.keys.forEach { key -> tagPlace[key] = -1 }
+
+                    for (i in searchRange) {
+                        val searchFor = "^ {${4 * i}}(\\*|\\d+\\.).*"
+                        if (line.matches(Regex(searchFor))) {
+                            val type = when (Regex("""(\*|\d+\.)""").find(line)?.value) {
+                                "*" -> "ul"
+                                null -> ""
+                                else -> "ol"
+                            }
+                            printed = true
+                            if (deque.peek() == "p") it.write("</${deque.pop()}>")
+                            if (type != "") {
+                                outputString = when {
+                                    i > nestedListLevel -> {
+                                        deque.push(type)
+                                        deque.push("li")
+                                        "<$type>"
+                                    }
+                                    i == nestedListLevel ->
+                                        "</li>"
+                                    else -> {
+                                        while (deque.size > 2 * (i + 1)) {
+                                            it.write("</${deque.pop()}>")
+                                        }
+                                        "</li>"
+                                    }
+                                } + Regex("""(\*|\d+\.)""").replace(line, "<li>")
+                                nestedListLevel = i
+                            }
+                        }
+                    }
+                    if (!printed) {
+                        if (deque.peek() != "p") {
+                            while (deque.isNotEmpty()) {
+                                it.write("</${deque.pop()}>")
+                            }
+                            deque.push("p")
+                            it.write("<p>")
+                        }
+                        outputString = line
+                    }
+                    val parts = Regex("""\*{1,3}|~~""").split(outputString)
+                    val tags = Regex("""\*{1,3}|~~""").findAll(outputString).map { matchResult ->
+                        if (matchResult.value != "***") {
+                            val tag = when (matchResult.value) {
+                                "*" -> "i"
+                                "**" -> "b"
+                                else -> "s"
+                            }
+                            tagState[tag] = !tagState[tag]!!
+                            if (tagState[tag] == false) {
+                                tagPlace[tag] = matchResult.range.first
+                                "<$tag>"
+                            } else {
+                                tagPlace[tag] = -1
+                                "</$tag>"
+                            }
+                        } else {
+                            tagState["i"] = !tagState["i"]!!
+                            tagState["b"] = !tagState["b"]!!
+                            if (tagState["i"] == false) {
+                                if (tagState["b"] == false) {
+                                    "<b><i>"
+                                } else {
+                                    "</b><i>"
+                                }
+                            } else {
+                                if (tagState["b"] == false) {
+                                    "</i><b>"
+                                } else {
+                                    if (tagPlace["i"]!! > tagPlace["b"]!!) "</i></b>" else "</b></i>"
+                                }
+                            }
+                        }
+                    }.toList()
+                    for (i in tags.indices) {
+                        it.write(parts[i] + tags[i])
+                    }
+                    it.write(parts.last())
                 }
-            })
+            }
+        while (deque.isNotEmpty()) {
+            it.write("</${deque.pop()}>")
+        }
+        it.write("</body></html>")
     }
 }
+
 
 /**
  * Средняя

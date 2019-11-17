@@ -445,6 +445,75 @@ TEW                                      DEW"""
         checkHtmlListsExample2()
     }
 
+    private fun checkHtml() {
+        val result = File("temp.html").readText().replace(Regex("[\\s\\n\\t]"), "")
+        val expected =
+            """<html>
+<body>
+<p>Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.</p>
+<ol>
+        <li>Chapter One
+            <ol>
+                <li>Section One</li>
+                <li>Section Two </li>
+                <li>Section Three
+                    <ul>
+                        <li>
+                            Утка по-пекински
+                            <ul>
+                                <li>Утка</li>
+                                <li>Соус</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Салат Оливье
+                            <ol>
+                                <li>Мясо
+                                    <ul>
+                                        <li>
+                                            Или колбаса
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>Майонез</li>
+                                <li>Картофель</li>
+                                <li>Что-то там ещё</li>
+                            </ol>
+                        </li>
+                        <li>Помидоры</li>
+                        <li>
+                            Фрукты
+                            <ol>
+                                <li>Бананы</li>
+                                <li>
+                                    Яблоки
+                                    <ol>
+                                        <li>Красные</li>
+                                        <li>Зелёные</li>
+                                    </ol>
+                                </li>
+                            </ol>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+        </li>
+        <li>Chapter Two</li>
+        <li>Chapter Three </li>
+    </ol>
+	<p>
+	Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
+</p>
+<p>
+Suspendisse <s>et elit in enim tempus iaculis</s>.
+</p>
+	</body>
+</html>""".trimIndent().replace(Regex("[\\s\\n\\t]"), "")
+        assertEquals(expected, result)
+
+        File("temp.html").delete()
+    }
+
     @Test
     @Tag("Impossible")
     fun markdownToHtml() {
@@ -453,6 +522,9 @@ TEW                                      DEW"""
 
         markdownToHtml("input/markdown_lists.md", "temp.html")
         checkHtmlListsExample()
+
+        markdownToHtml("input/markdown_complex.md", "temp.html")
+        checkHtml()
     }
 
     @Test
