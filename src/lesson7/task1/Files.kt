@@ -4,8 +4,6 @@ package lesson7.task1
 
 import lesson3.task1.digitNumber
 import java.io.File
-import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Пример
@@ -222,13 +220,7 @@ fun top20Words(inputName: String): Map<String, Int> {
                 top[word] = top.getOrDefault(word, 0) + 1
             }
     }
-    return with(top.toList().sortedByDescending { it.second }) {
-        try {
-            this.subList(0, 20).toMap()
-        } catch (e: IndexOutOfBoundsException) {
-            this.toMap()
-        }
-    }
+    return top.toList().sortedByDescending { it.second }.take(20).toMap()
 }
 
 /**
@@ -276,14 +268,10 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
                 Regex(searchFor, RegexOption.IGNORE_CASE).replace(text) { found ->
                     val match = found.value.first() // Всегда находится ровно один символ
                     with(dict.getValue(match.toLowerCase())) {
-                        if (this.isNotEmpty()) {
-                            (if (match.isUpperCase())
-                                this.first().toUpperCase()
-                            else
-                                this.first()) + this.substring(1)
-                        } else {
-                            ""
-                        }
+                        if (match.isUpperCase())
+                            this.capitalize()
+                        else
+                            this
                     }
                 }
             )

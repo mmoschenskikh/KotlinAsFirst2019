@@ -160,13 +160,15 @@ fun dateDigitToStr(digital: String): String {
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String) =
-    if (phone.matches(Regex("""^(\+?\d+ *)?(\([\d -]+\))?([\d -]+)$"""))) {
+fun flattenPhoneNumber(phone: String): String {
+    val unimportant = listOf(' ', '-')
+    return if (phone.filterNot { it in unimportant }.matches(Regex("""^(\+?\d+)?(\(\d+\))?(\d+)$"""))) {
         val list = ('0'..'9').toList() + '+'
         phone.filter { it in list }
     } else {
         ""
     }
+}
 
 /**
  * Средняя
@@ -180,7 +182,7 @@ fun flattenPhoneNumber(phone: String) =
  */
 fun bestLongJump(jumps: String) =
     if (jumps.matches(Regex("""^(\d+|[ %-]+)+$"""))) {
-        Regex("""\d+""").findAll(jumps).map { it.value.toInt() }.maxBy { it } ?: -1
+        Regex("""\d+""").findAll(jumps).map { it.value.toInt() }.max() ?: -1
     } else {
         -1
     }
@@ -196,17 +198,16 @@ fun bestLongJump(jumps: String) =
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int {
-    var best = -1
+fun bestHighJump(jumps: String): Int =
     if (jumps.matches(Regex("""^(\d+ [+%-]+ )*\d+ [+%-]+$"""))) {
-        best = Regex("""\d+ [+%-]+""").findAll(jumps).map {
+        Regex("""\d+ [+%-]+""").findAll(jumps).map {
             with(it.value.split(" ")) {
                 this[0].toInt() to this[1].toSet()
             }
-        }.toMap().filterValues { '+' in it }.maxBy { it.key }?.key ?: -1
+        }.toMap().filterValues { '+' in it }.keys.max() ?: -1
+    } else {
+        -1
     }
-    return best
-}
 
 /**
  * Сложная
@@ -218,17 +219,14 @@ fun bestHighJump(jumps: String): Int {
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 fun plusMinus(expression: String): Int {
-    if (expression.matches(Regex("""^\d+( [+-] \d+)*$"""))) {
-        var sum = Regex("""^\d+""").find(expression)!!.value.toInt()
-        Regex("""[+-] \d+""").findAll(expression).forEach {
-            with(it.value.split(" ")) {
-                sum += this[1].toInt() * if (this[0] == "+") 1 else -1
-            }
+    require(expression.matches(Regex("""^\d+( [+-] \d+)*$""")))
+    var sum = Regex("""^\d+""").find(expression)!!.value.toInt()
+    Regex("""[+-] \d+""").findAll(expression).forEach {
+        with(it.value.split(" ")) {
+            sum += this[1].toInt() * if (this[0] == "+") 1 else -1
         }
-        return sum
-    } else {
-        throw IllegalArgumentException()
     }
+    return sum
 }
 
 /**
@@ -253,9 +251,10 @@ fun firstDuplicateIndex(str: String) = Regex("""([^\s]+) \1""").find(str.toLower
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше либо равны нуля.
  */
-fun mostExpensive(description: String) =
-    if (description.split("; ").all { Regex(""".+ \d+(\.\d+)?""").matches(it) }) {
-        description.split("; ").map {
+fun mostExpensive(description: String): String {
+    val goods = description.split("; ")
+    return if (goods.all { Regex(""".+ \d+(\.\d+)?""").matches(it) }) {
+        goods.map {
             with(it.split(" ")) {
                 this[0] to this[1].toDouble()
             }
@@ -263,6 +262,7 @@ fun mostExpensive(description: String) =
     } else {
         ""
     }
+}
 
 /**
  * Сложная

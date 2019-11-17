@@ -229,6 +229,16 @@ TEW                                      DEW"""
                 "уж" to 95
             ), top20Words("input/onegin.txt")
         )
+        assertEquals(
+            mapOf(
+                "карминовый" to 1,
+                "боязливый" to 1,
+                "некрасивый" to 1,
+                "остроумный" to 1,
+                "белоглазый" to 1,
+                "фиолетовый" to 1
+            ), top20Words("input/chaotic_in1.txt")
+        )
     }
 
     @Test
