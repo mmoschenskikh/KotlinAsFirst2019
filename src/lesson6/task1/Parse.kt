@@ -347,37 +347,34 @@ fun fromRoman(roman: String): Int {
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    if (isValidExpression(commands)) {
-        val braces = braceScanner(commands)
-        val state = MutableList(cells) { 0 }
-        var count = 0 // число выполненных команд
-        var command = 0 // индекс инструкции в commands
-        var position = cells / 2
-        while (count < limit && command < commands.length) {
-            try {
-                when (commands[command]) {
-                    '>' -> position++
-                    '<' -> position--
-                    '+' -> state[position]++
-                    '-' -> state[position]--
-                    '[' -> if (state[position] == 0) {
-                        command = braces.getValue(command)
-                    }
-                    ']' -> if (state[position] != 0) {
-                        command = braces.getValue(command)
-                    }
+    require(isValidExpression(commands))
+    val braces = braceScanner(commands)
+    val state = MutableList(cells) { 0 }
+    var count = 0 // число выполненных команд
+    var command = 0 // индекс инструкции в commands
+    var position = cells / 2
+    while (count < limit && command < commands.length) {
+        try {
+            when (commands[command]) {
+                '>' -> position++
+                '<' -> position--
+                '+' -> state[position]++
+                '-' -> state[position]--
+                '[' -> if (state[position] == 0) {
+                    command = braces.getValue(command)
                 }
-                state[position]
-            } catch (e: IndexOutOfBoundsException) {
-                throw IllegalStateException()
+                ']' -> if (state[position] != 0) {
+                    command = braces.getValue(command)
+                }
             }
-            count++
-            command++
+            state[position]
+        } catch (e: IndexOutOfBoundsException) {
+            throw IllegalStateException()
         }
-        return state
-    } else {
-        throw IllegalArgumentException()
+        count++
+        command++
     }
+    return state
 }
 
 fun braceScanner(commands: String): Map<Int, Int> {
