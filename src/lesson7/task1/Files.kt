@@ -458,6 +458,71 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  *
  * Все остальные части исходного текста должны остаться неизменными с точностью до наборов пробелов и переносов строк.
  *
+ * Пример входного файла:
+///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
+ * Утка по-пекински
+ * Утка
+ * Соус
+ * Салат Оливье
+1. Мясо
+ * Или колбаса
+2. Майонез
+3. Картофель
+4. Что-то там ещё
+ * Помидоры
+ * Фрукты
+1. Бананы
+23. Яблоки
+1. Красные
+2. Зелёные
+///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
+ *
+ *
+ * Соответствующий выходной файл:
+///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
+<html>
+<body>
+<ul>
+<li>
+Утка по-пекински
+<ul>
+<li>Утка</li>
+<li>Соус</li>
+</ul>
+</li>
+<li>
+Салат Оливье
+<ol>
+<li>Мясо
+<ul>
+<li>
+Или колбаса
+</li>
+</ul>
+</li>
+<li>Майонез</li>
+<li>Картофель</li>
+<li>Что-то там ещё</li>
+</ol>
+</li>
+<li>Помидоры</li>
+<li>
+Фрукты
+<ol>
+<li>Бананы</li>
+<li>
+Яблоки
+<ol>
+<li>Красные</li>
+<li>Зелёные</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+</body>
+</html>
+///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlLists(inputName: String, outputName: String) {
@@ -743,14 +808,11 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var remainder = minuend - subtrahend
     var splitSize = maxOf(digitNumber(remainder), strSubtrahend.length)
     val shift = if (digitsTaken < strSubtrahend.length) 1 else 0
+    var gap = shift + digitsTaken
     File(outputName).bufferedWriter().use {
         it.write(' ' * shift + "$lhv" + " | " + "$rhv\n")
-        it.write(
-            String.format("%${shift + digitsTaken}s", strSubtrahend)
-                    + ' ' * (lhvLength - digitsTaken + 3) + lhv / rhv + '\n'
-        )
-        it.write(String.format("%${shift + digitsTaken}s\n", '-' * splitSize))
-        var gap = shift + digitsTaken
+        it.write(String.format("%${gap}s", strSubtrahend) + ' ' * (lhvLength - digitsTaken + 3) + lhv / rhv + '\n')
+        it.write(String.format("%${gap}s\n", '-' * splitSize))
         while (digitsTaken < lhvLength) {
             strMinuend = remainder.toString() + digits[digitsTaken]
             minuend = strMinuend.toInt()
