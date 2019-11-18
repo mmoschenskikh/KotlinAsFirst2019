@@ -691,24 +691,18 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
                ----
                3081"""
         )
-
-        fun pdp(num1: Int, num2: Int) {
-            printDivisionProcess(num1, num2, "temp.txt")
-            println(File("temp.txt").readText())
-            File("temp.txt").delete()
-        }
-        pdp(5538, 26)
-        pdp(17714, 34)
-        pdp(2415, 23)
-        pdp(1750, 25)
-        pdp(558, 18)
-        pdp(6344, 61)
-        pdp(0, 239)
-        pdp(143078, 77976)
-        pdp(3081, 3638)
-        pdp(101877, 5123)
+        test(
+            105762,
+            6804,
+            """
+105762 | 6804
+-6804    15
+-----
+ 37722
+-34020
+------
+  3702"""
+        )
         assertThrows(ArithmeticException::class.java) { printDivisionProcess(13280, 0, "temp.txt") }
-
-        File("temp.txt").delete()
     }
 }

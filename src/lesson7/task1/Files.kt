@@ -426,12 +426,6 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     }
 }
 
-fun main() {
-    markdownToHtmlSimple("input/markdown_simple — копия.md", "temp.txt")
-    println(File("temp.txt").readText())
-    File("temp.txt").delete()
-}
-
 /**
  * Сложная
  *
@@ -734,46 +728,42 @@ operator fun Int.times(charSequence: CharSequence): String =
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    val result = lhv / rhv
-    var width = digitNumber(lhv) + 1
-    val digits = lhv.toString().toList().map { it.toString() }
+    val digits = lhv.toString().map { it.toString() }
+    var digitsTaken = 0
+    var minuend = 0
+    var strMinuend = ""
+    val lhvLength = digitNumber(lhv)
+    while (minuend < rhv && digitsTaken < lhvLength) {
+        strMinuend += digits[digitsTaken]
+        minuend = strMinuend.toInt()
+        digitsTaken++
+    }
+    var subtrahend = minuend - minuend % rhv
+    var strSubtrahend = "-$subtrahend"
+    var remainder = minuend - subtrahend
+    var splitSize = maxOf(digitNumber(remainder), strSubtrahend.length)
+    val shift = if (digitsTaken < strSubtrahend.length) 1 else 0
     File(outputName).bufferedWriter().use {
-        var minuend = 0
-        var digitsTaken = 0
-        while (minuend < rhv && digitsTaken < digits.size) {
-            minuend = digits.subList(0, digitsTaken + 1).joinToString(separator = "").toInt()
+        it.write(' ' * shift + "$lhv" + " | " + "$rhv\n")
+        it.write(
+            String.format("%${shift + digitsTaken}s", strSubtrahend)
+                    + ' ' * (lhvLength - digitsTaken + 3) + lhv / rhv + '\n'
+        )
+        it.write(String.format("%${shift + digitsTaken}s\n", '-' * splitSize))
+        var gap = shift + digitsTaken
+        while (digitsTaken < lhvLength) {
+            strMinuend = remainder.toString() + digits[digitsTaken]
+            minuend = strMinuend.toInt()
             digitsTaken++
-        }
-        var strMinuend = "$minuend"
-        var subtrahend = minuend - minuend % rhv
-        var strSubtrahend = "-$subtrahend"
-        var remainder = minuend - subtrahend
-        var gap = 2 + width - digitNumber(subtrahend)
-        if ((digitsTaken == digits.size || minuend < rhv) && strMinuend.length >= strSubtrahend.length) {
-            val shift = if (digitsTaken >= strSubtrahend.length) digitsTaken - strSubtrahend.length else 0
-            width -= 1
-            it.write(String.format("%${width}d | %d\n", lhv, rhv))
-            it.write(' ' * shift + strSubtrahend + ' ' * 3 + "$result\n")
-            it.write(String.format("%${width}s", '-' * (maxOf(strSubtrahend.length, digitNumber(remainder))) + '\n'))
-        } else {
-            it.write(String.format("%${width}d | %d\n", lhv, rhv))
-            it.write(strSubtrahend + ' ' * gap + "$result\n")
-            it.write('-' * (maxOf(strSubtrahend.length, digitNumber(remainder))) + '\n')
-        }
-        while (digitsTaken < digits.size) {
-            if (remainder < rhv) {
-                strMinuend = remainder.toString() + digits[digitsTaken]
-                minuend = strMinuend.toInt()
-            }
-            gap = 2 + digitsTaken
             subtrahend = minuend - minuend % rhv
             strSubtrahend = "-$subtrahend"
             remainder = minuend - subtrahend
-            digitsTaken++
+            splitSize = maxOf(digitNumber(remainder), strSubtrahend.length)
+            gap = shift + digitsTaken
             it.write(String.format("%${gap}s\n", strMinuend))
             it.write(String.format("%${gap}s\n", strSubtrahend))
-            it.write(String.format("%${gap}s\n", '-' * maxOf(strMinuend.length, strSubtrahend.length)))
+            it.write(String.format("%${gap}s\n", '-' * splitSize))
         }
-        it.write(String.format("%${width}d", remainder))
+        it.write(String.format("%${gap}s\n", remainder))
     }
 }
