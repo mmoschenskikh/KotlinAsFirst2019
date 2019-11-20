@@ -68,6 +68,17 @@ class Triangle private constructor(private val points: Set<Point>) {
  * Окружность с заданным центром и радиусом
  */
 data class Circle(val center: Point, val radius: Double) {
+
+    constructor(a: Point, b: Point, c: Point) : this(
+        bisectorByPoints(a, b).crossPoint(bisectorByPoints(b, c)),
+        a.distance(b) * b.distance(c) * c.distance(a) / (4 * Triangle(a, b, c).area())
+    )
+
+    constructor(diameter: Segment) : this(
+        diameter.middlePoint(),
+        diameter.begin.distance(diameter.end) / 2
+    )
+
     /**
      * Простая
      *
@@ -128,11 +139,7 @@ fun diameter(vararg points: Point): Segment {
  * Построить окружность по её диаметру, заданному двумя точками
  * Центр её должен находиться посередине между точками, а радиус составлять половину расстояния между ними
  */
-fun circleByDiameter(diameter: Segment): Circle =
-    Circle(
-        diameter.middlePoint(),
-        diameter.begin.distance(diameter.end) / 2
-    )
+fun circleByDiameter(diameter: Segment): Circle = Circle(diameter)
 
 /**
  * Прямая, заданная точкой point и углом наклона angle (в радианах) по отношению к оси X.
@@ -177,7 +184,7 @@ class Line private constructor(val b: Double, val angle: Double) {
 fun lineBySegment(s: Segment): Line {
     val incY = s.begin.y - s.end.y
     val incX = s.begin.x - s.end.x
-    val angle = if (incX == 0.0) PI / 2 else (atan(incY / incX) + 2 * PI) % PI
+    val angle = if (incX == 0.0) PI / 2 else (atan(incY / incX) + PI) % PI
     return Line(s.begin, angle)
 }
 
@@ -220,10 +227,7 @@ fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
  * (построить окружность по трём точкам, или
  * построить окружность, описанную вокруг треугольника - эквивалентная задача).
  */
-fun circleByThreePoints(a: Point, b: Point, c: Point): Circle = Circle(
-    bisectorByPoints(a, b).crossPoint(bisectorByPoints(b, c)),
-    a.distance(b) * b.distance(c) * c.distance(a) / (4 * Triangle(a, b, c).area())
-)
+fun circleByThreePoints(a: Point, b: Point, c: Point): Circle = Circle(a, b, c)
 
 /**
  * Очень сложная
@@ -236,5 +240,41 @@ fun circleByThreePoints(a: Point, b: Point, c: Point): Circle = Circle(
  * три точки данного множества, либо иметь своим диаметром отрезок,
  * соединяющий две самые удалённые точки в данном множестве.
  */
-fun minContainingCircle(vararg points: Point): Circle = TODO()
+fun minContainingCircle(vararg points: Point): Circle {
+    require(points.isNotEmpty())
+    val size = points.size
+    if (size == 1) return Circle(points[0], 0.0)
+    val circles = MutableList(3) { Circle(Segment(points[0], points[1])) }
+    for (i in 3..size) {
+        if (circles[i - 1].contains(points[i - 1])) {
+            circles.add(circles[i - 1])
+        } else {
+            circles.add(minDiskWithPoint(points.take(i - 1), points[i - 1]))
+        }
+    }
+    return circles[size]
+}
 
+fun minDiskWithPoint(s: List<Point>, q: Point): Circle {
+    val circles = MutableList(2) { Circle(Segment(s[0], q))}
+    for (i in 2..s.size) {
+        if (circles[i - 1].contains(s[i - 1])) {
+            circles.add(circles[i - 1])
+        } else {
+            circles.add(minDiskWith2Points(s.take(i - 1), s[i - 1], q))
+        }
+    }
+    return circles[s.size]
+}
+
+fun minDiskWith2Points(p: List<Point>, q1: Point, q2: Point): Circle {
+    val d = mutableListOf(Circle(Segment(q1, q2)))
+    for (i in 1..p.size) {
+        if (d[i - 1].contains(p[i - 1])) {
+            d.add(d[i - 1])
+        } else {
+            d.add(Circle(q1, q2, p[i - 1]))
+        }
+    }
+    return d[p.size]
+}
