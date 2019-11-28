@@ -2,6 +2,7 @@
 
 package lesson9.task2
 
+import lesson4.task1.accumulate
 import lesson9.task1.Matrix
 import lesson9.task1.createMatrix
 
@@ -119,7 +120,28 @@ fun <E> rotate(matrix: Matrix<E>): Matrix<E> = TODO()
  * 1 2 3
  * 3 1 2
  */
-fun isLatinSquare(matrix: Matrix<Int>): Boolean = TODO()
+fun isLatinSquare(matrix: Matrix<Int>): Boolean {
+    if (matrix.height == matrix.width) {
+        val pattern = (1..matrix.height).toList()
+        var isLatin = true
+        matrix.forEachRow {
+            if (it.sorted() != pattern) {
+                isLatin = false
+                return@forEachRow
+            }
+        }
+        if (!isLatin) return false
+        matrix.forEachColumn {
+            if (it.sorted() != pattern) {
+                isLatin = false
+                return@forEachColumn
+            }
+        }
+        return isLatin
+    } else {
+        return false
+    }
+}
 
 /**
  * Средняя
@@ -155,7 +177,13 @@ fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> = TODO()
  * 0 0 1 0
  * 0 0 0 0
  */
-fun findHoles(matrix: Matrix<Int>): Holes = TODO()
+fun findHoles(matrix: Matrix<Int>): Holes {
+    val holesRows = mutableListOf<Int>()
+    val holesColumns = mutableListOf<Int>()
+    matrix.forEachRowIndexed { index, row -> if (row.all { it == 0 }) holesRows.add(index) }
+    matrix.forEachColumnIndexed { index, column -> if (column.all { it == 0 }) holesColumns.add(index) }
+    return Holes(holesRows, holesColumns)
+}
 
 /**
  * Класс для описания местонахождения "дырок" в матрице
@@ -176,7 +204,16 @@ data class Holes(val rows: List<Int>, val columns: List<Int>)
  *
  * К примеру, центральный элемент 12 = 1 + 2 + 4 + 5, элемент в левом нижнем углу 12 = 1 + 4 + 7 и так далее.
  */
-fun sumSubMatrix(matrix: Matrix<Int>): Matrix<Int> = TODO()
+fun sumSubMatrix(matrix: Matrix<Int>): Matrix<Int> {
+    val result = createMatrix(matrix.height, matrix.width, 0)
+    /*matrix.forEachRowIndexed { index, row ->
+        accumulate(row)
+    }
+    matrix.forEachColumnIndexed { index, column ->
+        accumulate(column)
+    }*/
+    return result
+}
 
 /**
  * Сложная
@@ -208,8 +245,8 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  */
 operator fun Matrix<Int>.unaryMinus(): Matrix<Int> {
     val result = this
-    for (i in 0 until height) {
-        for (j in 0 until width) {
+    forEachRowIndexed { i, _ ->
+        forEachColumnIndexed { j, _ ->
             result[i, j] = -this[i, j]
         }
     }
@@ -227,14 +264,9 @@ operator fun Matrix<Int>.unaryMinus(): Matrix<Int> {
 operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> {
     require(width == other.height)
     val result = createMatrix(height, other.width, 0)
-    var i = -1
-    var j: Int
-    this.forEachRow { row ->
-        i++
-        j = -1
-        other.forEachColumn { column ->
-            j++
-            result[i, j] = row.zip(column) { rowNumber, columnNumber -> rowNumber * columnNumber }.sum()
+    this.forEachRowIndexed { i, row ->
+        other.forEachColumnIndexed { j, column ->
+            result[i, j] = row.zip(column) { a, b -> a * b }.sum()
         }
     }
     return result

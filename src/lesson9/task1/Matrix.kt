@@ -36,6 +36,20 @@ interface Matrix<E> {
     fun forEachRow(action: (MutableList<E>) -> Unit)
 
     fun forEachColumn(action: (MutableList<E>) -> Unit)
+
+    /**
+     * Производит определённое [действие] над каждым рядом, предоставляя сам ряд и его индекс.
+     * @param [действие] функция, получающая ряд и его индекс, производит заданную операцию
+     * над рядом.
+     */
+    fun forEachRowIndexed(action: (index: Int, MutableList<E>) -> Unit)
+
+    /**
+     * Производит определённое [действие] над каждым столбцом, предоставляя сам столбец и его индекс.
+     * @param [действие] функция, получающая столбец и его индекс, производит заданную операцию
+     * над столбцом.
+     */
+    fun forEachColumnIndexed(action: (index: Int, MutableList<E>) -> Unit)
 }
 
 /**
@@ -107,6 +121,22 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
                 column.add(this[j, i])
             }
             action(column)
+        }
+    }
+
+    override fun forEachRowIndexed(action: (index: Int, MutableList<E>) -> Unit) {
+        var index = 0
+        for (row in list) action(index++, row)
+    }
+
+    override fun forEachColumnIndexed(action: (index: Int, MutableList<E>) -> Unit) {
+        var index = 0
+        for (i in 0 until width) {
+            val column = mutableListOf<E>()
+            for (j in 0 until height) {
+                column.add(this[j, i])
+            }
+            action(index++, column)
         }
     }
 }
