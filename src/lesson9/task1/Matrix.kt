@@ -33,22 +33,18 @@ interface Matrix<E> {
 
     operator fun set(cell: Cell, value: E)
 
+    fun mapRows(transform: (MutableList<E>) -> MutableList<E>) : Matrix<E>
+
+    fun mapRowsIndexed(transform: (index: Int, MutableList<E>) -> MutableList<E>) : Matrix<E>
+
+    fun mapColumns(transform: (MutableList<E>) -> MutableList<E>) : Matrix<E>
+
     fun forEachRow(action: (MutableList<E>) -> Unit)
 
     fun forEachColumn(action: (MutableList<E>) -> Unit)
 
-    /**
-     * Производит определённое [действие] над каждым рядом, предоставляя сам ряд и его индекс.
-     * @param [действие] функция, получающая ряд и его индекс, производит заданную операцию
-     * над рядом.
-     */
     fun forEachRowIndexed(action: (index: Int, MutableList<E>) -> Unit)
 
-    /**
-     * Производит определённое [действие] над каждым столбцом, предоставляя сам столбец и его индекс.
-     * @param [действие] функция, получающая столбец и его индекс, производит заданную операцию
-     * над столбцом.
-     */
     fun forEachColumnIndexed(action: (index: Int, MutableList<E>) -> Unit)
 }
 
@@ -138,5 +134,30 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
             }
             action(index++, column)
         }
+    }
+
+    override fun mapRows(transform: (MutableList<E>) -> MutableList<E>): Matrix<E> {
+        val matrix = this
+        forEachRowIndexed { rowIndex, row ->
+            transform(row).forEachIndexed { columnIndex, e -> matrix[rowIndex, columnIndex] = e }
+        }
+        return matrix
+    }
+
+    override fun mapRowsIndexed(transform: (index: Int, MutableList<E>) -> MutableList<E>): Matrix<E> {
+        var index = 0
+        val matrix = this
+        forEachRowIndexed { rowIndex, row ->
+            transform(index++, row).forEachIndexed { columnIndex, e -> matrix[rowIndex, columnIndex] = e }
+        }
+        return matrix
+    }
+
+    override fun mapColumns(transform: (MutableList<E>) -> MutableList<E>): Matrix<E> {
+        val matrix = this
+        forEachColumnIndexed { columnIndex, column ->
+            transform(column).forEachIndexed { rowIndex, e -> matrix[rowIndex, columnIndex] = e }
+        }
+        return matrix
     }
 }

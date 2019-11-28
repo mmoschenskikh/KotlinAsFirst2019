@@ -204,16 +204,7 @@ data class Holes(val rows: List<Int>, val columns: List<Int>)
  *
  * К примеру, центральный элемент 12 = 1 + 2 + 4 + 5, элемент в левом нижнем углу 12 = 1 + 4 + 7 и так далее.
  */
-fun sumSubMatrix(matrix: Matrix<Int>): Matrix<Int> {
-    val result = createMatrix(matrix.height, matrix.width, 0)
-    /*matrix.forEachRowIndexed { index, row ->
-        accumulate(row)
-    }
-    matrix.forEachColumnIndexed { index, column ->
-        accumulate(column)
-    }*/
-    return result
-}
+fun sumSubMatrix(matrix: Matrix<Int>): Matrix<Int> = matrix.mapRows { accumulate(it) }.mapColumns { accumulate(it) }
 
 /**
  * Сложная
@@ -245,8 +236,8 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  */
 operator fun Matrix<Int>.unaryMinus(): Matrix<Int> {
     val result = this
-    forEachRowIndexed { i, _ ->
-        forEachColumnIndexed { j, _ ->
+    for (i in 0 until height) {
+        for (j in 0 until width) {
             result[i, j] = -this[i, j]
         }
     }
