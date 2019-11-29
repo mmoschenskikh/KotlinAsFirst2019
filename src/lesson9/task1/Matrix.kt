@@ -97,13 +97,12 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
 
     override fun toString(): String {
         val sb = StringBuilder()
+        sb.append("[")
         for (row in 0 until height) {
-            for (column in 0 until width) {
-                sb.append(this[row, column])
-                sb.append(" ")
-            }
-            sb.append("\n")
+            sb.append(list[row].joinToString(prefix = "[", postfix = "]"))
+            if (row != height - 1) sb.append(",\n")
         }
+        sb.append("]")
         return "$sb"
     }
 
@@ -157,6 +156,14 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
         val matrix = this
         forEachColumnIndexed { columnIndex, column ->
             transform(column).forEachIndexed { rowIndex, e -> matrix[rowIndex, columnIndex] = e }
+        }
+        return matrix
+    }
+
+    fun mapColumnsIndexed(transform: (index: Int, MutableList<E>) -> MutableList<E>): Matrix<E> {
+        val matrix = this
+        forEachColumnIndexed { columnIndex, column ->
+            transform(columnIndex, column).forEachIndexed { rowIndex, e -> matrix[rowIndex, columnIndex] = e }
         }
         return matrix
     }

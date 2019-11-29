@@ -105,7 +105,15 @@ fun generateSnake(height: Int, width: Int): Matrix<Int> = TODO()
  * 4 5 6      8 5 2
  * 7 8 9      9 6 3
  */
-fun <E> rotate(matrix: Matrix<E>): Matrix<E> = TODO()
+fun <E> rotate(matrix: Matrix<E>): Matrix<E> {
+    require(matrix.height == matrix.width)
+    val result = createMatrix(matrix.height, matrix.width, matrix[0, 0])
+    val rows = mutableListOf<MutableList<E>>()
+    matrix.forEachRow { row -> rows.add(row) }
+    rows.reverse()
+    result.mapColumnsIndexed { i, _ -> rows[i] }
+    return result
+}
 
 /**
  * Сложная
