@@ -4,6 +4,7 @@ package lesson9.task2
 
 import lesson4.task1.accumulate
 import lesson9.task1.Matrix
+import lesson9.task1.MatrixImpl
 import lesson9.task1.createMatrix
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
