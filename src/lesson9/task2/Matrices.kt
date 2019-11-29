@@ -3,6 +3,8 @@
 package lesson9.task2
 
 import lesson4.task1.accumulate
+import lesson7.task1.pop
+import lesson9.task1.Cell
 import lesson9.task1.Matrix
 import lesson9.task1.MatrixImpl
 import lesson9.task1.createMatrix
@@ -244,7 +246,7 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * При инвертировании знак каждого элемента матрицы следует заменить на обратный
  */
 operator fun Matrix<Int>.unaryMinus(): Matrix<Int> {
-    val result = this
+    val result = createMatrix(height, width, this[0, 0])
     for (i in 0 until height) {
         for (j in 0 until width) {
             result[i, j] = -this[i, j]
@@ -299,7 +301,36 @@ operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> {
  * 0  4 13  6
  * 3 10 11  8
  */
-fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> = TODO()
+fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
+    val neighbors = mutableMapOf<Int, Cell>()
+    val mvs = moves.toMutableList()
+    var zero = Cell(0, 0)
+    var move: Int
+    matrix.forEachRowIndexed { rowIndex, row -> if (0 in row) zero = Cell(rowIndex, row.indexOf(0)) }
+    while (mvs.isNotEmpty()) {
+        if (zero.row != matrix.height - 1) {
+            neighbors[matrix[zero.row + 1, zero.column]] = Cell(zero.row + 1, zero.column)
+        }
+        if (zero.row != 0) {
+            neighbors[matrix[zero.row - 1, zero.column]] = Cell(zero.row - 1, zero.column)
+        }
+        if (zero.column != matrix.width - 1) {
+            neighbors[matrix[zero.row, zero.column + 1]] = Cell(zero.row, zero.column + 1)
+        }
+        if (zero.column != 0) {
+            neighbors[matrix[zero.row, zero.column - 1]] = Cell(zero.row, zero.column - 1)
+        }
+        move = mvs.pop()
+        if (move in neighbors.keys) {
+            matrix[zero] = move
+            zero = neighbors.getValue(move)
+            matrix[zero] = 0
+        } else {
+            throw IllegalStateException("Некорректный ход")
+        }
+    }
+    return matrix
+}
 
 /**
  * Очень сложная
