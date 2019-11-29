@@ -6,7 +6,6 @@ import lesson4.task1.accumulate
 import lesson7.task1.pop
 import lesson9.task1.Cell
 import lesson9.task1.Matrix
-import lesson9.task1.MatrixImpl
 import lesson9.task1.createMatrix
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
@@ -171,7 +170,27 @@ fun isLatinSquare(matrix: Matrix<Int>): Boolean {
  *
  * 42 ===> 0
  */
-fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> = TODO()
+fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> {
+    val result = createMatrix(matrix.height, matrix.width, 0)
+    val verticalSize = (0 until matrix.height).toList()
+    val horizontalSize = (0 until matrix.width).toList()
+    result.mapRowsIndexed { rowIndex, row ->
+        row.mapIndexed { columnIndex, _ ->
+            var sum = 0
+            for (i in (rowIndex - 1)..(rowIndex + 1)) {
+                for (j in (columnIndex - 1)..(columnIndex + 1)) {
+                    sum += when {
+                        i == rowIndex && j == columnIndex -> 0
+                        i in verticalSize && j in horizontalSize -> matrix[i, j]
+                        else -> 0
+                    }
+                }
+            }
+            sum
+        }.toMutableList()
+    }
+    return result
+}
 
 /**
  * Средняя
