@@ -244,19 +244,22 @@ fun minContainingCircle(vararg points: Point): Circle {
     require(points.isNotEmpty())
     if (points.size == 1) return Circle(points[0], 0.0)
     val diameter = diameter(*points)
-    var minCircle = Circle(diameter)
-    if (points.any { !minCircle.contains(it) }) {
+    val diameterCircle = Circle(diameter)
+    if (points.any { !diameterCircle.contains(it) }) {
         var currentCircle: Circle
+        var minCircle: Circle
         val pointList =
             points.toSet().filterNot {
-                minCircle.contains(it) || it == diameter.begin || it == diameter.end
+                diameterCircle.contains(it) || it == diameter.begin || it == diameter.end
             }
+        minCircle = Circle(diameter.begin, diameter.end, pointList[0])
         pointList.forEach { point ->
             currentCircle = Circle(diameter.begin, diameter.end, point)
-            if (pointList.all { currentCircle.contains(it) }) {
+            if (pointList.all { currentCircle.contains(it) } && currentCircle.radius < minCircle.radius) {
                 minCircle = currentCircle
             }
         }
+        return minCircle
     }
-    return minCircle
+    return diameterCircle
 }
