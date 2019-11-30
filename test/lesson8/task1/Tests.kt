@@ -434,5 +434,19 @@ class Tests {
         )
         val result4 = minContainingCircle(*pointList3.toTypedArray())
         assertEquals(447.52088457778905, result4.radius, 0.001)
+        val pointList4 = listOf(
+            Point(0.0, -5e-324),
+            Point(0.7087535586806538, 0.0),
+            Point(0.7493130590049135, -632.0),
+            Point(5e-324, 0.9901931405543415),
+            Point(-632.0, -5e-324),
+            Point(-5e-324, -5e-324),
+            Point(0.8357444730893675, 0.9814959132776238),
+            Point(0.928270485580728, -2.220446049250313e-16),
+            Point(0.7755549723039242, 0.31289085084572255),
+            Point(0.3013911574837743, 5e-324)
+        )
+        val result5 = minContainingCircle(*pointList4.toTypedArray())
+        assertEquals(447.157123030728, result5.radius, 0.001)
     }
 }
