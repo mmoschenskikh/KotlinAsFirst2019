@@ -33,7 +33,7 @@ interface Matrix<E> {
 
     operator fun set(cell: Cell, value: E)
 
-    fun forEachRow(action: (MutableList<E>) -> Unit)
+    /*fun forEachRow(action: (MutableList<E>) -> Unit)
 
     fun forEachColumn(action: (MutableList<E>) -> Unit)
 
@@ -47,7 +47,7 @@ interface Matrix<E> {
 
     fun mapColumns(transform: (MutableList<E>) -> MutableList<E>): Matrix<E>
 
-    fun mapColumnsIndexed(transform: (index: Int, MutableList<E>) -> MutableList<E>): Matrix<E>
+    fun mapColumnsIndexed(transform: (index: Int, MutableList<E>) -> MutableList<E>): Matrix<E>*/
 
 }
 
@@ -108,7 +108,7 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
         return "$sb"
     }
 
-    override fun forEachRow(action: (MutableList<E>) -> Unit) {
+    /*override fun forEachRow(action: (MutableList<E>) -> Unit) {
         for (row in list) action(row)
     }
 
@@ -168,7 +168,7 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
             transform(columnIndex, column).forEachIndexed { rowIndex, e -> matrix[rowIndex, columnIndex] = e }
         }
         return matrix
-    }
+    }*/
 
     override fun hashCode(): Int {
         var result = height

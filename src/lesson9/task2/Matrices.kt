@@ -107,14 +107,14 @@ fun generateSnake(height: Int, width: Int): Matrix<Int> = TODO()
  * 4 5 6      8 5 2
  * 7 8 9      9 6 3
  */
-fun <E> rotate(matrix: Matrix<E>): Matrix<E> {
+fun <E> rotate(matrix: Matrix<E>): Matrix<E> /*{
     require(matrix.height == matrix.width)
     val result = createMatrix(matrix.height, matrix.width, matrix[0, 0])
     val rows = mutableListOf<MutableList<E>>()
     matrix.forEachRow { row -> rows.add(row) }
     rows.reverse()
     return result.mapColumnsIndexed { i, _ -> rows[i] }
-}
+}*/ = TODO()
 
 /**
  * Сложная
@@ -129,7 +129,7 @@ fun <E> rotate(matrix: Matrix<E>): Matrix<E> {
  * 1 2 3
  * 3 1 2
  */
-fun isLatinSquare(matrix: Matrix<Int>): Boolean {
+fun isLatinSquare(matrix: Matrix<Int>): Boolean /*{
     if (matrix.height == matrix.width) {
         val pattern = (1..matrix.height).toList()
         var isLatin = true
@@ -150,7 +150,7 @@ fun isLatinSquare(matrix: Matrix<Int>): Boolean {
     } else {
         return false
     }
-}
+}*/ = TODO()
 
 /**
  * Средняя
@@ -169,7 +169,7 @@ fun isLatinSquare(matrix: Matrix<Int>): Boolean {
  *
  * 42 ===> 0
  */
-fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> {
+fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> /*{
     val verticalSize = (0 until matrix.height).toList()
     val horizontalSize = (0 until matrix.width).toList()
     return createMatrix(matrix.height, matrix.width, 0).mapRowsIndexed { rowIndex, row ->
@@ -187,7 +187,7 @@ fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> {
             sum
         }.toMutableList()
     }
-}
+}*/ = TODO()
 
 /**
  * Средняя
@@ -204,13 +204,13 @@ fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> {
  * 0 0 1 0
  * 0 0 0 0
  */
-fun findHoles(matrix: Matrix<Int>): Holes {
+fun findHoles(matrix: Matrix<Int>): Holes /*{
     val holesRows = mutableListOf<Int>()
     val holesColumns = mutableListOf<Int>()
     matrix.forEachRowIndexed { index, row -> if (row.all { it == 0 }) holesRows.add(index) }
     matrix.forEachColumnIndexed { index, column -> if (column.all { it == 0 }) holesColumns.add(index) }
     return Holes(holesRows, holesColumns)
-}
+}*/ = TODO()
 
 /**
  * Класс для описания местонахождения "дырок" в матрице
@@ -231,7 +231,7 @@ data class Holes(val rows: List<Int>, val columns: List<Int>)
  *
  * К примеру, центральный элемент 12 = 1 + 2 + 4 + 5, элемент в левом нижнем углу 12 = 1 + 4 + 7 и так далее.
  */
-fun sumSubMatrix(matrix: Matrix<Int>): Matrix<Int> = matrix.mapRows { accumulate(it) }.mapColumns { accumulate(it) }
+fun sumSubMatrix(matrix: Matrix<Int>): Matrix<Int> /*= matrix.mapRows { accumulate(it) }.mapColumns { accumulate(it) }*/ = TODO()
 
 /**
  * Сложная
@@ -279,7 +279,7 @@ operator fun Matrix<Int>.unaryMinus(): Matrix<Int> {
  * В противном случае бросить IllegalArgumentException.
  * Подробно про порядок умножения см. статью Википедии "Умножение матриц".
  */
-operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> {
+operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> /*{
     require(width == other.height)
     val result = createMatrix(height, other.width, 0)
     this.forEachRowIndexed { i, row ->
@@ -288,7 +288,7 @@ operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> {
         }
     }
     return result
-}
+}*/ = TODO()
 
 /**
  * Сложная
@@ -317,7 +317,7 @@ operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> {
  * 0  4 13  6
  * 3 10 11  8
  */
-fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
+fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> /*{
     val neighbors = mutableMapOf<Int, Cell>()
     val mvs = moves.toMutableList()
     var zero = Cell(0, 0)
@@ -346,7 +346,7 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
         }
     }
     return matrix
-}
+}*/ = TODO()
 
 /**
  * Очень сложная
