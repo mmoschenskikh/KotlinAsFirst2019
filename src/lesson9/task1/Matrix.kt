@@ -138,7 +138,7 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
     }
 
     override fun mapRows(transform: (MutableList<E>) -> MutableList<E>): Matrix<E> {
-        val matrix = this
+        val matrix = createMatrix(height, width, this[0, 0])
         forEachRowIndexed { rowIndex, row ->
             transform(row).forEachIndexed { columnIndex, e -> matrix[rowIndex, columnIndex] = e }
         }
@@ -147,7 +147,7 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
 
     override fun mapRowsIndexed(transform: (index: Int, MutableList<E>) -> MutableList<E>): Matrix<E> {
         var index = 0
-        val matrix = this
+        val matrix = createMatrix(height, width, this[0, 0])
         forEachRowIndexed { rowIndex, row ->
             transform(index++, row).forEachIndexed { columnIndex, e -> matrix[rowIndex, columnIndex] = e }
         }
@@ -155,7 +155,7 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
     }
 
     override fun mapColumns(transform: (MutableList<E>) -> MutableList<E>): Matrix<E> {
-        val matrix = this
+        val matrix = createMatrix(height, width, this[0, 0])
         forEachColumnIndexed { columnIndex, column ->
             transform(column).forEachIndexed { rowIndex, e -> matrix[rowIndex, columnIndex] = e }
         }
@@ -163,7 +163,7 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
     }
 
     override fun mapColumnsIndexed(transform: (index: Int, MutableList<E>) -> MutableList<E>): Matrix<E> {
-        val matrix = this
+        val matrix = createMatrix(height, width, this[0, 0])
         forEachColumnIndexed { columnIndex, column ->
             transform(columnIndex, column).forEachIndexed { rowIndex, e -> matrix[rowIndex, columnIndex] = e }
         }

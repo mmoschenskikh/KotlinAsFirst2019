@@ -242,40 +242,21 @@ fun circleByThreePoints(a: Point, b: Point, c: Point): Circle = Circle(a, b, c)
  */
 fun minContainingCircle(vararg points: Point): Circle {
     require(points.isNotEmpty())
-    val pts = points.toSet().toList()
-    val size = pts.size
-    if (size == 1) return Circle(pts[0], 0.0)
-    val circles = MutableList(3) { Circle(Segment(pts[0], pts[1])) }
-    for (i in 3..size) {
-        if (circles[i - 1].contains(pts[i - 1])) {
-            circles.add(circles[i - 1])
-        } else {
-            circles.add(minDiskWithPoint(pts.take(i - 1), pts[i - 1]))
+    if (points.size == 1) return Circle(points[0], 0.0)
+    val diameter = diameter(*points)
+    var minCircle = Circle(diameter)
+    if (points.any { !minCircle.contains(it) }) {
+        var currentCircle: Circle
+        val pointList =
+            points.toSet().filterNot {
+                minCircle.contains(it) || it == diameter.begin || it == diameter.end
+            }
+        pointList.forEach { point ->
+            currentCircle = Circle(diameter.begin, diameter.end, point)
+            if (pointList.all { currentCircle.contains(it) }) {
+                minCircle = currentCircle
+            }
         }
     }
-    return circles[size]
-}
-
-fun minDiskWithPoint(s: List<Point>, q: Point): Circle {
-    val circles = MutableList(2) { Circle(Segment(s[0], q)) }
-    for (i in 2..s.size) {
-        if (circles[i - 1].contains(s[i - 1])) {
-            circles.add(circles[i - 1])
-        } else {
-            circles.add(minDiskWith2Points(s.take(i - 1), s[i - 1], q))
-        }
-    }
-    return circles[s.size]
-}
-
-fun minDiskWith2Points(p: List<Point>, q1: Point, q2: Point): Circle {
-    val d = mutableListOf(Circle(Segment(q1, q2)))
-    for (i in 1..p.size) {
-        if (d[i - 1].contains(p[i - 1])) {
-            d.add(d[i - 1])
-        } else {
-            d.add(Circle(q1, q2, p[i - 1]))
-        }
-    }
-    return d[p.size]
+    return minCircle
 }

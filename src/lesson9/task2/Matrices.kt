@@ -113,8 +113,7 @@ fun <E> rotate(matrix: Matrix<E>): Matrix<E> {
     val rows = mutableListOf<MutableList<E>>()
     matrix.forEachRow { row -> rows.add(row) }
     rows.reverse()
-    result.mapColumnsIndexed { i, _ -> rows[i] }
-    return result
+    return result.mapColumnsIndexed { i, _ -> rows[i] }
 }
 
 /**
@@ -171,10 +170,9 @@ fun isLatinSquare(matrix: Matrix<Int>): Boolean {
  * 42 ===> 0
  */
 fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> {
-    val result = createMatrix(matrix.height, matrix.width, 0)
     val verticalSize = (0 until matrix.height).toList()
     val horizontalSize = (0 until matrix.width).toList()
-    result.mapRowsIndexed { rowIndex, row ->
+    return createMatrix(matrix.height, matrix.width, 0).mapRowsIndexed { rowIndex, row ->
         row.mapIndexed { columnIndex, _ ->
             var sum = 0
             for (i in (rowIndex - 1)..(rowIndex + 1)) {
@@ -189,7 +187,6 @@ fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> {
             sum
         }.toMutableList()
     }
-    return result
 }
 
 /**
