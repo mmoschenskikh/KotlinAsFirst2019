@@ -19,6 +19,8 @@ class PolynomTest {
     fun getValue() {
         val p = Polynom(1.0, 3.0, 2.0)
         assertEquals(42.0, p.getValue(5.0), 1e-10)
+        val q = Polynom(0.0)
+        assertEquals(0.0, q.getValue(5.0))
     }
 
     @Test
@@ -38,8 +40,10 @@ class PolynomTest {
         val p1 = Polynom(1.0, -2.0, -1.0, 4.0)
         val p2 = Polynom(1.0, 3.0, 2.0)
         val r = Polynom(1.0, -1.0, 2.0, 6.0)
+        val q = Polynom(2.0, -3.0, 1.0, 10.0)
         assertApproxEquals(r, p1 + p2, 1e-10)
         assertApproxEquals(r, p2 + p1, 1e-10)
+        assertApproxEquals(q, r + p1, 1e-10)
     }
 
     @Test
@@ -102,5 +106,6 @@ class PolynomTest {
     @Tag("Normal")
     fun hashCodeTest() {
         assertEquals(Polynom(1.0, 2.0, 3.0).hashCode(), Polynom(1.0, 2.0, 3.0).hashCode())
+        assertEquals(Polynom(0.0, 1.0, 2.0, 3.0).hashCode(), Polynom(1.0, 2.0, 3.0).hashCode())
     }
 }

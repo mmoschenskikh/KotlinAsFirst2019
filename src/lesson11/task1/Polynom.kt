@@ -21,15 +21,28 @@ package lesson11.task1
  */
 class Polynom(vararg coeffs: Double) {
 
+    private val coeffList = coeffs
+
+    private val significantCoeffs =
+        if (coeffList.all { it == 0.0 }) listOf(0.0) else coeffList.dropWhile { it == 0.0 }.reversed()
+
     /**
      * Геттер: вернуть значение коэффициента при x^i
      */
-    fun coeff(i: Int): Double = TODO()
+    fun coeff(i: Int): Double = coeffList[i]
 
     /**
      * Расчёт значения при заданном x
      */
-    fun getValue(x: Double): Double = TODO()
+    fun getValue(x: Double): Double {
+        var value = 0.0
+        var variable = 1.0
+        significantCoeffs.forEach { coeff ->
+            value += coeff * variable
+            variable *= x
+        }
+        return value
+    }
 
     /**
      * Степень (максимальная степень x при ненулевом слагаемом, например 2 для x^2+x+1).
@@ -38,22 +51,31 @@ class Polynom(vararg coeffs: Double) {
      * Слагаемые с нулевыми коэффициентами игнорировать, т.е.
      * степень 0x^2+0x+2 также равна 0.
      */
-    fun degree(): Int = TODO()
+    fun degree(): Int = significantCoeffs.size - 1
 
     /**
      * Сложение
      */
-    operator fun plus(other: Polynom): Polynom = TODO()
+    operator fun plus(other: Polynom): Polynom =
+        if (degree() >= other.degree()) {
+            Polynom(
+                *(significantCoeffs
+                    .take(other.degree() + 1).zip(other.significantCoeffs).map { it.first + it.second }
+                        + significantCoeffs.takeLast(degree() - other.degree()))
+                    .reversed().toDoubleArray())
+        } else {
+            (other + this)
+        }
 
     /**
      * Смена знака (при всех слагаемых)
      */
-    operator fun unaryMinus(): Polynom = TODO()
+    operator fun unaryMinus(): Polynom = Polynom(*significantCoeffs.reversed().map { -it }.toDoubleArray())
 
     /**
      * Вычитание
      */
-    operator fun minus(other: Polynom): Polynom = TODO()
+    operator fun minus(other: Polynom): Polynom = this + -other
 
     /**
      * Умножение
@@ -78,10 +100,17 @@ class Polynom(vararg coeffs: Double) {
     /**
      * Сравнение на равенство
      */
-    override fun equals(other: Any?): Boolean = TODO()
+    override fun equals(other: Any?): Boolean =
+        other is Polynom && significantCoeffs == other.significantCoeffs
 
     /**
      * Получение хеш-кода
      */
-    override fun hashCode(): Int = TODO()
+    override fun hashCode(): Int {
+        var result = degree()
+        significantCoeffs.forEach {
+            result = result * 31 + it.hashCode()
+        }
+        return result
+    }
 }
