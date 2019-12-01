@@ -80,7 +80,18 @@ class Polynom(vararg coeffs: Double) {
     /**
      * Умножение
      */
-    operator fun times(other: Polynom): Polynom = TODO()
+    operator fun times(other: Polynom): Polynom {
+        val result = mutableMapOf<Int, MutableList<Double>>()
+        for (i in other.significantCoeffs.indices) {
+            for (j in significantCoeffs.indices) {
+                if (result[i + j] == null) result[i + j] = mutableListOf()
+                result[i + j]!!.add(other.coeff(i) * coeff(j))
+            }
+        }
+        return Polynom(
+            *result.mapValues { it.value.sum() }.toList().sortedByDescending { it.first }.map { it.second }.reversed().toDoubleArray()
+        )
+    }
 
     /**
      * Деление
