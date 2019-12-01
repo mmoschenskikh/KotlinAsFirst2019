@@ -29,7 +29,7 @@ class Polynom(vararg coeffs: Double) {
     /**
      * Геттер: вернуть значение коэффициента при x^i
      */
-    fun coeff(i: Int): Double = coeffList[i]
+    fun coeff(i: Int): Double = significantCoeffs.reversed()[i]
 
     /**
      * Расчёт значения при заданном x
@@ -101,12 +101,25 @@ class Polynom(vararg coeffs: Double) {
      *
      * Если A / B = C и A % B = D, то A = B * C + D и степень D меньше степени B
      */
-    operator fun div(other: Polynom): Polynom = TODO()
+    operator fun div(other: Polynom): Polynom {
+        val result = MutableList(degree() - other.degree() + 1) { 0.0 }
+        var minuend: Polynom
+        var subtrahend: Polynom
+        var remainder = this
+        while (remainder.degree() >= other.degree() && remainder != Polynom(0.0)) {
+            minuend = remainder
+            val k = remainder.degree() - other.degree()
+            result[k] = remainder.coeff(0) / other.coeff(0)
+            subtrahend = polynomByLeading(result[k], k) * other
+            remainder = minuend - subtrahend
+        }
+        return Polynom(*result.reversed().toDoubleArray())
+    }
 
     /**
      * Взятие остатка
      */
-    operator fun rem(other: Polynom): Polynom = TODO()
+    operator fun rem(other: Polynom): Polynom = this - other * (this / other)
 
     /**
      * Сравнение на равенство
@@ -124,4 +137,8 @@ class Polynom(vararg coeffs: Double) {
         }
         return result
     }
+
+    override fun toString(): String = significantCoeffs.reversed().joinToString()
 }
+
+fun polynomByLeading(coeff: Double, degree: Int) = Polynom(coeff, *List(degree) { 0.0 }.toDoubleArray())
