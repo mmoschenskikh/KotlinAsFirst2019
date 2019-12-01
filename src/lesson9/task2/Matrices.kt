@@ -129,28 +129,32 @@ fun <E> rotate(matrix: Matrix<E>): Matrix<E> /*{
  * 1 2 3
  * 3 1 2
  */
-fun isLatinSquare(matrix: Matrix<Int>): Boolean /*{
+fun isLatinSquare(matrix: Matrix<Int>): Boolean {
     if (matrix.height == matrix.width) {
         val pattern = (1..matrix.height).toList()
-        var isLatin = true
-        matrix.forEachRow {
-            if (it.sorted() != pattern) {
-                isLatin = false
-                return@forEachRow
+        for (i in 0 until matrix.height) {
+            val row = mutableListOf<Int>()
+            for (j in 0 until matrix.width) {
+                row.add(matrix[i, j])
+            }
+            if (row.sorted() != pattern) {
+                return false
             }
         }
-        if (!isLatin) return false
-        matrix.forEachColumn {
-            if (it.sorted() != pattern) {
-                isLatin = false
-                return@forEachColumn
+        for (j in 0 until matrix.width) {
+            val column = mutableListOf<Int>()
+            for (i in 0 until matrix.height) {
+                column.add(matrix[i, j])
+            }
+            if (column.sorted() != pattern) {
+                return false
             }
         }
-        return isLatin
+        return true
     } else {
         return false
     }
-}*/ = TODO()
+}
 
 /**
  * Средняя
@@ -231,7 +235,8 @@ data class Holes(val rows: List<Int>, val columns: List<Int>)
  *
  * К примеру, центральный элемент 12 = 1 + 2 + 4 + 5, элемент в левом нижнем углу 12 = 1 + 4 + 7 и так далее.
  */
-fun sumSubMatrix(matrix: Matrix<Int>): Matrix<Int> /*= matrix.mapRows { accumulate(it) }.mapColumns { accumulate(it) }*/ = TODO()
+fun sumSubMatrix(matrix: Matrix<Int>): Matrix<Int> /*= matrix.mapRows { accumulate(it) }.mapColumns { accumulate(it) }*/ =
+    TODO()
 
 /**
  * Сложная
@@ -317,12 +322,19 @@ operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> /*{
  * 0  4 13  6
  * 3 10 11  8
  */
-fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> /*{
+fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
     val neighbors = mutableMapOf<Int, Cell>()
     val mvs = moves.toMutableList()
     var zero = Cell(0, 0)
     var move: Int
-    matrix.forEachRowIndexed { rowIndex, row -> if (0 in row) zero = Cell(rowIndex, row.indexOf(0)) }
+    for (i in 0 until matrix.height) {
+        for (j in 0 until matrix.width) {
+            if (matrix[i, j] == 0) {
+                zero = Cell(i, j)
+                break
+            }
+        }
+    }
     while (mvs.isNotEmpty()) {
         if (zero.row != matrix.height - 1) {
             neighbors[matrix[zero.row + 1, zero.column]] = Cell(zero.row + 1, zero.column)
@@ -346,7 +358,7 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> /*{
         }
     }
     return matrix
-}*/ = TODO()
+}
 
 /**
  * Очень сложная
